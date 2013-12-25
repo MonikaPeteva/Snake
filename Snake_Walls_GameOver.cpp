@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+//#include <iostream>
 #include <conio.h>
 #include <time.h>
 #include <string>
@@ -15,17 +16,16 @@ typedef vector<GameObject>::const_iterator const_iterator;
 
 // Window constants
 const int WindowWidth = 70;
-const int WindowHeight = 25;
+const int WindowHeight = 30;
 const int BorderX = 3, BorderY = 2;
-
-
 // Snake
 const int SnakeSpeed = 1;
 const int SnakeStartingLength = 5;
 const char SnakeSymbol = '*',
-                FruitSymbol = '+',
+				FruitSymbol = '+',
 				PoisonSymbol = '-',
 				WallSymbol = 'X';
+
 // Game variables
 unsigned long sleepDuration = 200;
 const int ESC = 27;
@@ -34,16 +34,12 @@ vector<GameObject> fruit;
 vector<GameObject> poison;
 vector<GameObject> wall;
 
-int Score;
-int MaxScore = 0;
-COORD direction ;
+COORD direction = { 1, 0 };
 
-void Initialization();
 void CenterString(string s);
-void PrintScore();
 void GameInstructions();
 void DisplayHighestScore();
-COORD GanaratingCoordinations();
+COORD GanaratingCoordinations ();
 void QuitGameOver();
 int  QuitGame();
 void Menu();
@@ -69,10 +65,6 @@ void Update()
 {
         // Save the tail, we might need it later.
         GameObject tail = *(snake.end() - 1);
-//		GameObject tail_old = *(snake.end() - 1);
-
-//		tail_old.Symbol = ' ';
-		tail.Symbol = ' ';
 
         for (randomAccess_iterator i = snake.end() - 1; i != snake.begin(); --i)
         {
@@ -112,43 +104,20 @@ void Update()
         snake.begin()->Coordinates.Y += direction.Y;
 
         GameObject head = *snake.begin();
-
-		head.Draw(consoleHandle);
-//		tail_old.Draw(consoleHandle);
-		tail.Draw(consoleHandle);
-
-
 		for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
-//		for (const_iterator i = fruit.begin(); i != fruit.end(); ++i)
         {
                 if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                 {
                         // Remove the old fruit, increase the snake's size
-						Score += 5;
-						PrintScore();
-
                         fruit.erase(i);
-
-//						i->Symbol = ' ';
-//						i->Draw(consoleHandle);
-
                         snake.push_back(tail);
-
-						tail.Symbol = '*';
-						tail.Draw(consoleHandle);
 
                         // Add a new fruit
 												
 						COORD CurrentCoordinates = GanaratingCoordinations ();
 						//int x = rand() % (WindowWidth-2*(BorderX+1))+BorderX+1;
 						//int y = rand() % (WindowHeight-2*(BorderY+1))+BorderY+1;
-//						tail_old = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol);
-						tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol);
-//						fruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol));
-						fruit.push_back(tail);
-
-//						tail_old.Draw(consoleHandle);
-						tail.Draw(consoleHandle);
+						fruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol));
 
                         sleepDuration *= (sleepDuration > 50) * 0.1 + 0.9;
 
@@ -163,23 +132,9 @@ void Update()
                 if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                 {
                     // Remove poison and decrease the snake's size
-					if (snake.begin() < snake.end()-1)
+					if (snake.begin() < snake.end())
 					{
-						Score -= 3;
-						PrintScore();
-
                         poison.erase(i);
-
-//						i->Symbol = ' ';
-//						i->Draw(consoleHandle);
-
-//						tail_old = *(snake.end() - 1);
-//						tail_old.Symbol = ' ';
-//						tail_old.Draw(consoleHandle);
-						tail = *(snake.end() - 1);
-						tail.Symbol = ' ';
-						tail.Draw(consoleHandle);
-
                         snake.erase(snake.end() - 1);
 
                         // Add a new poison
@@ -188,12 +143,7 @@ void Update()
 						COORD CurrentCoordinates = GanaratingCoordinations ();
 						//int x = rand() % WindowWidth;
                         //int y = rand() % WindowHeight;
-//						tail_old = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol);
-						tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol);
-						poison.push_back(tail);
-
-//						tail_old.Draw(consoleHandle);
-						tail.Draw(consoleHandle);
+                        poison.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol));
 
                         sleepDuration *= (sleepDuration > 50) * 0.1 + 0.9;
                         
@@ -202,18 +152,13 @@ void Update()
 					}
 					else
 					{
-//						i->Coordinates.X = 0;
-//						i->Coordinates.Y = 9;
-//						i->Symbol = ' ';
-//						i->Color = 0x4;
-//						i->Draw(consoleHandle);
-						QuitGameOver();
+						QuitGame();
 					}
                 }
 
         }
 
-		//if the snake touch the border
+//		GameObject endsnake = *(snake.end() -1);
 		for (randomAccess_iterator i = wall.begin(); i != wall.end(); ++i)
         {
 				if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
@@ -223,32 +168,11 @@ void Update()
 					i->Symbol = '*';
 					i->Color = 0x4;
 					i->Draw(consoleHandle);
-
-	//				i->Coordinates.X = 0;
-	//				i->Coordinates.Y = 9;
-	//				i->Symbol = ' ';
+					i->Coordinates.X = 0;
+					i->Coordinates.Y = 11;
+					i->Symbol = ' ';
 					//i->Color = 0x4;
-	//				i->Draw(consoleHandle);
-                    QuitGameOver();
-                }
-
-        }
-
-		//if the snake touch the snake
-		for (randomAccess_iterator i = snake.begin() + 1; i != snake.end(); ++i)
-        {
-				if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
-                {
-					tail.Symbol = ' ';
-					tail.Draw(consoleHandle);
-					i->Symbol = '*';
-					i->Color = 0x4;
 					i->Draw(consoleHandle);
-	//				i->Coordinates.X = 0;
-	//				i->Coordinates.Y = 9;
-	//				i->Symbol = ' ';
-					//i->Color = 0x4;
-	//				i->Draw(consoleHandle);
                     QuitGameOver();
                 }
 
@@ -257,9 +181,8 @@ void Update()
 
 void Draw()
 {
+        ClearScreen(consoleHandle);
 
-//        ClearScreen(consoleHandle);
-		PrintScore();
         for (const_iterator snakeBody = snake.begin(); snakeBody != snake.end(); ++snakeBody)
         {
                 snakeBody->Draw(consoleHandle);
@@ -279,35 +202,8 @@ void Draw()
         {
                 brick->Draw(consoleHandle);
         }
+
 }
-
-
-//void DrawWall()
-//{
-/*        ClearScreen(consoleHandle);
-
-        for (const_iterator snakeBody = snake.begin(); snakeBody != snake.end(); ++snakeBody)
-        {
-                snakeBody->Draw(consoleHandle);
-        }
-
-        for (const_iterator singleFruit = fruit.begin(); singleFruit != fruit.end(); ++singleFruit)
-        {
-                singleFruit->Draw(consoleHandle);
-        }
-
-		for (const_iterator singlePoison = poison.begin(); singlePoison != poison.end(); ++singlePoison)
-        {
-                singlePoison->Draw(consoleHandle);
-        }
-*/
-//		for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)
-//        {
-//                brick->Draw(consoleHandle);
-//        }
-//
-//}
-
 
 void Menu()
 {
@@ -323,13 +219,10 @@ void Menu()
         {
         case '1':
                 ClearScreen(consoleHandle);
-//				DrawWall();
-				Initialization();
-				Draw();
-				while (true)
+				 while (true)
                         {
                                 Update();
-//                                Draw();
+                                Draw();
 								Sleep(sleepDuration);
                         }
                         break;
@@ -351,16 +244,14 @@ int main()
 {
 	consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE );
 	// Randomize stuff
+        srand(time(NULL));
 
-    srand(time(NULL));
+        for (int i = SnakeStartingLength-1; i > -1; --i)
+        {
+			snake.push_back(GameObject(i+BorderX+1, 3, SnakeSymbol));
+        }
 
-//	Initialization ();	  
-//        for (int i = SnakeStartingLength-1; i > -1; --i)
-//        {
-//			snake.push_back(GameObject(i+BorderX+1, 3, SnakeSymbol));
-//        }
-//
-//		GeneratingWall (WindowWidth, WindowHeight);
+		GeneratingWall (WindowWidth, WindowHeight);
 
 		COORD CurrentCoordinates = GanaratingCoordinations ();
 	    //int x1 = rand() % WindowWidth;
@@ -422,15 +313,6 @@ void DisplayHighestScore()
 
 void QuitGameOver()
 {
-	if (MaxScore<Score) MaxScore=Score;
-
-	GameObject current (0,9,' ');
-//	i->Coordinates.X = 0;
-//	i->Coordinates.Y = 9;
-//	i->Symbol = ' ';
-	current.Color = 0x4;
-	current.Draw(consoleHandle);
-
 	//ClearScreen(consoleHandle);
 	cout<<"\n";
 	cout<<" #     #                  #                            \n";
@@ -441,10 +323,6 @@ void QuitGameOver()
 	cout<<"    #    #    # #    #    #       #    # #    # #      \n";
 	cout<<"    #     ####   ####     #######  ####   ####  ###### \n";
 	
-	GameObject tail = *(snake.end() - 1);
-//	tail.Color = 0x1;
-	tail.Draw(consoleHandle);
-
 	char k = getch();
 	//system ("pause");
 	ClearScreen(consoleHandle);
@@ -456,7 +334,6 @@ int QuitGame() //Trqbva da se dobavi maxscore
 	ClearScreen(consoleHandle);
 	//cout << "\n\n\n\n";
 	//CenterString("You Lose!\n\n");
-	
     return 0;
 }
 
@@ -466,32 +343,4 @@ COORD GanaratingCoordinations ()
 	momental.X = rand() % (WindowWidth-2*(BorderX+1))+BorderX+1;
 	momental.Y = rand() % (WindowHeight-2*(BorderY+1))+BorderY+1;
 	return momental;
-}
-
-void Initialization ()
-{
-	Score = 0;
-	direction.X = 1;
-	direction.Y = 0;
-
-	while(snake.begin() != snake.end())
-		snake.erase(snake.end() - 1);
-
-	for (int i = SnakeStartingLength-1; i > -1; --i)
-        {
-			snake.push_back(GameObject(i+BorderX+1, BorderY+1, SnakeSymbol));
-        }
-
-		GeneratingWall (WindowWidth, WindowHeight);
-}
-
-void PrintScore()
-{
-	string text;
-	GameObject current (0,0,' ');
-	current.Color = 0x2;
-	current.Draw(consoleHandle);
-	text = "Max Score: " +  to_string(MaxScore) + "        Score: " + to_string(Score);
-	CenterString(text);
-	current.Color = 15;
 }
