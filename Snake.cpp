@@ -365,18 +365,33 @@ void CenterString(string str)
 
 void GameInstructions()
 {
+	string border (WindowWidth, ':');
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		cout << "\n\n";
+
+
         CenterString("Here are the rules:\n\n");
         CenterString("You control the snake.\n");
-        CenterString("When it eats one of the fruits, the snake grows bigger.\n");
-        CenterString("Your goal is to grow as big as possible.\n");
-        CenterString("If you ...... you die.\n\n");
+		CenterString("When it eats one of the fruits, the snake grows longer.\n");
+		CenterString("When it eats one of the poisonous fruits, the snake gets shorter.\n");
+		CenterString("Your goal is to make the snake as long as possible.\n");
+        CenterString("If the snake crosses itself or bumps into a border, it dies.\n\n");
         CenterString("To go FORWARD press 'w'\n");
         CenterString("To go BACK press 's'\n");
         CenterString("To turn RIGHT press 'd'\n");
         CenterString("To turn LEFT press 'a'\n\n");
-        CenterString("Press 'ESC' to get back to the main menu\n");
+        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
         char k = getch();
-        if (k == ESC)
+        if (k == ESC)  //return to main menu if ESC is pressed
         {
                 ClearScreen(consoleHandle);
                 Menu();
