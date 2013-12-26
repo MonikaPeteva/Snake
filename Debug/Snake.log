@@ -1,32 +1,34 @@
-﻿Build started 26.12.2013 г. 21:18:02 ч..
+﻿Build started 26.12.2013 г. 21:49:33 ч..
      1>Project "D:\Snake ot ASCII\Snake.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Snake.cpp
          Snake.cpp
-     1>d:\snake ot ascii\snake.cpp(69): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>d:\snake ot ascii\snake.cpp(106): warning C4129: '_' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(107): warning C4129: '_' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(110): warning C4129: '^' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(110): warning C4129: ' ' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(111): warning C4129: '^' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(112): warning C4129: ' ' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(113): warning C4129: '^' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(114): warning C4129: '^' : unrecognized character escape sequence
-     1>d:\snake ot ascii\snake.cpp(119): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(152): warning C4129: '_' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(153): warning C4129: '_' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(156): warning C4129: '^' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(156): warning C4129: ' ' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(157): warning C4129: '^' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(158): warning C4129: ' ' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(159): warning C4129: '^' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(160): warning C4129: '^' : unrecognized character escape sequence
+     1>d:\snake ot ascii\snake.cpp(165): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(176): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(231): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(201): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(256): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(212): warning C4018: '>' : signed/unsigned mismatch
-     1>d:\snake ot ascii\snake.cpp(238): warning C4996: 'kbhit': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _kbhit. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(289): warning C4996: 'kbhit': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _kbhit. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(133) : see declaration of 'kbhit'
-     1>d:\snake ot ascii\snake.cpp(240): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(291): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(272): warning C4018: '>' : signed/unsigned mismatch
-     1>d:\snake ot ascii\snake.cpp(313): warning C4244: '*=' : conversion from 'double' to 'unsigned long', possible loss of data
-     1>d:\snake ot ascii\snake.cpp(440): warning C4018: '>' : signed/unsigned mismatch
-     1>d:\snake ot ascii\snake.cpp(462): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(323): warning C4018: '>' : signed/unsigned mismatch
+     1>d:\snake ot ascii\snake.cpp(367): warning C4244: '*=' : conversion from 'double' to 'unsigned long', possible loss of data
+     1>d:\snake ot ascii\snake.cpp(481): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>d:\snake ot ascii\snake.cpp(524): warning C4018: '>' : signed/unsigned mismatch
+     1>d:\snake ot ascii\snake.cpp(546): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+                 c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
+     1>d:\snake ot ascii\snake.cpp(555): warning C4018: '>' : signed/unsigned mismatch
+     1>d:\snake ot ascii\snake.cpp(674): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
        Link:
          C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Snake ot ASCII\Debug\Snake.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\Snake ot ASCII\Debug\Snake.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Snake ot ASCII\Debug\Snake.lib" /MACHINE:X86 Debug\ConsoleGaming.obj
@@ -36,4 +38,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:03.16
+Time Elapsed 00:00:03.11
