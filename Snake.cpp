@@ -37,8 +37,8 @@ vector<GameObject> fruit;
 vector<GameObject> poison;
 vector<GameObject> wall;
 
-int Score;
-int MaxScore = 0;
+unsigned int Score;
+unsigned int MaxScore = 0;
 COORD direction ;
 
 void Initialization();
@@ -159,7 +159,12 @@ void Update()
                     // Remove poison and decrease the snake's size
 						if (snake.begin() < snake.end()-1)
                             {
-                                Score -= 5;
+								if (Score == 0)
+								{
+									QuitGameOver();
+								}
+								else
+									Score -= 5;
                                 PrintScore();
 
 								poison.erase(i);
