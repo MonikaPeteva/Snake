@@ -256,15 +256,41 @@ void Draw()
 
 void Menu()
 {
-		Beep(520,300);
+		string border (WindowWidth, ':');
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 
+		cout << "\n\n";
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
         CenterString("Welcome to SNAKE GAME 1.0!\n\n");
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
         CenterString("Choose action:\n");
+		cout << endl;
         CenterString("1. Play New Game\n");
-        CenterString("2.See Game Instructions\n");
+        CenterString("2. See Game Instructions\n");
         CenterString("3. See Highest Score\n");
-        CenterString("4.Exit Game\n\n");
+        CenterString("4. Exit Game\n");
+
+		Beep(520,300);
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of border
         
+cout << "      _    _" << endl;
+cout << "   ,-(|)--(|)-." << endl;
+cout << "   \_   ..   _/" << endl;
+cout << "     \______/"<<endl;
+cout << "       V  V                                  ____" << endl;
+cout << "       `.^^`.                               /^,--`" << endl;
+cout << "         \^^^\                             (^^\\" << endl;
+cout << "         |^^^|                  _,-._       \^^\\"<< endl;
+cout << "        (^^^^\      __      _,-'^^^^^`.    _,'^^)"<< endl;
+cout << "         \^^^^`._,-'^^`-._.'^^^^__^^^^ `--'^^^_/"<< endl;
+cout << "          \^^^^^ ^^^_^^^^^^^_,-'  `.^^^^^^^^_/"<< endl;
+cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
         char k = getch();
         switch(k)
         {
@@ -444,7 +470,7 @@ void PrintScore()
         current.Color = 15;
 }
 
-void SaveScore(int score)
+void SaveScore(int score) //saves score to scores.txt
 {
 	ofstream o_ScoreFile("scores.txt");
 	if (o_ScoreFile.is_open())
@@ -454,7 +480,7 @@ void SaveScore(int score)
 	}
 }
 
-int GetScore()
+int GetScore() //reads score from scores.txt
 {
 	ifstream i_ScoreFile("scores.txt");
 		int current_high_score = 0;
@@ -470,8 +496,20 @@ int GetScore()
 
 void DisplayHighestScore()
 {
-	cout << "Highest score: " << GetScore() << "\n";
-        CenterString("Press 'ESC' to get back to the main menu\n");
+		string border (WindowWidth, ':');
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		cout << "\n\n";
+
+		CenterString("Highest score: " + to_string(GetScore()) + "\n\n");
+        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 
         char k = getch();
         if (k == ESC)
