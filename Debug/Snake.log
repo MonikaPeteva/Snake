@@ -1,22 +1,22 @@
-﻿Build started 26.12.2013 г. 01:13:03 ч..
+﻿Build started 26.12.2013 г. 19:26:42 ч..
      1>Project "D:\Snake ot ASCII\Snake.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Snake.cpp
          Snake.cpp
-     1>d:\snake ot ascii\snake.cpp(83): warning C4996: 'kbhit': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _kbhit. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(87): warning C4996: 'kbhit': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _kbhit. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(133) : see declaration of 'kbhit'
-     1>d:\snake ot ascii\snake.cpp(85): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(89): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(153): warning C4244: '*=' : conversion from 'double' to 'unsigned long', possible loss of data
-     1>d:\snake ot ascii\snake.cpp(198): warning C4244: '*=' : conversion from 'double' to 'unsigned long', possible loss of data
-     1>d:\snake ot ascii\snake.cpp(321): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(157): warning C4244: '*=' : conversion from 'double' to 'unsigned long', possible loss of data
+     1>d:\snake ot ascii\snake.cpp(202): warning C4244: '*=' : conversion from 'double' to 'unsigned long', possible loss of data
+     1>d:\snake ot ascii\snake.cpp(325): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(355): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>d:\snake ot ascii\snake.cpp(401): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(359): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>d:\snake ot ascii\snake.cpp(405): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(415): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(419): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
-     1>d:\snake ot ascii\snake.cpp(448): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
+     1>d:\snake ot ascii\snake.cpp(452): warning C4996: 'getch': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _getch. See online help for details.
                  c:\program files\microsoft visual studio 11.0\vc\include\conio.h(131) : see declaration of 'getch'
        Link:
          C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Snake ot ASCII\Debug\Snake.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\Snake ot ASCII\Debug\Snake.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Snake ot ASCII\Debug\Snake.lib" /MACHINE:X86 Debug\ConsoleGaming.obj
@@ -26,4 +26,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.77
+Time Elapsed 00:00:04.59
