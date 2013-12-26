@@ -6,6 +6,7 @@
 
 typedef unsigned char ConsoleColor;
 
+
 class GameObject
 {
 private:
@@ -59,14 +60,14 @@ namespace ConsoleColors
 	enum Colors
 	{
 		// Color space is ARGB
-		Blue = 0x1,
+		LightBlue = 0x9,
 		Green = 0x2,
 		Red = 0x4,
-		Yellow = Red | Green,
-		Purple = Blue | Green,
-		Cyan = Blue | Green,
+		Yellow = 0x6,
+		Purple = 0x5,
+		Cyan = LightBlue | Green,
 		Black = 0,
-		White = Red | Green | Blue
+		White = 0x7
 	};
 }
 
