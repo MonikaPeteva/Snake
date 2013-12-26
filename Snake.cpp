@@ -1,10 +1,8 @@
-#include <iostream>
-#include <vector>
-#include <conio.h>
-#include <time.h>
 #include <string>
 #include <fstream>
 #include <cstdlib>
+#include <stdlib.h>
+#include <ctime>
 
 #include "ConsoleGaming.h"
 
@@ -25,7 +23,6 @@ const int BorderX = 3, BorderY = 2;
 const int SnakeSpeed = 1;
 const int SnakeStartingLength = 5;
 const char SnakeSymbol = '*',
-           FruitSymbol = '+',
            PoisonSymbol = '-',
            WallSymbol = 'X';
 
@@ -56,12 +53,16 @@ void SaveScore(int score);
 int GetScore();
 void SetDifficulty();
 void QuitGameOver();
+char RandomizeFruitSymbol();
+
+char FruitSymbol = RandomizeFruitSymbol();
 
 int main()
 {
         consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE );
         // Randomize stuff
 
+		char FruitSymbol = RandomizeFruitSymbol();
 		srand(time(NULL));
         COORD CurrentCoordinates = GanaratingCoordinations ();
         fruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol));
@@ -186,7 +187,7 @@ void GameInstructions()
         }
 }
 
-void DisplayHighestScore() //“ÛÍ ÚË Á‡·Ë‚‡
+void DisplayHighestScore() //–¢—É–∫ —Ç–∏ –∑–∞–±–∏–≤–∞
 {
 		string border (WindowWidth, ':');
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
@@ -353,7 +354,7 @@ void Update()
 						Beep(700,850);
 
                         // Add a new fruit
-                                                                                                
+						FruitSymbol = RandomizeFruitSymbol();                                                                       
                        COORD CurrentCoordinates = GanaratingCoordinations ();
                        tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol);
                        fruit.push_back(tail);
@@ -595,4 +596,50 @@ void QuitGameOver()
         char k = getch();
         ClearScreen(consoleHandle);
         Menu();
+}
+
+char RandomizeFruitSymbol()
+{
+	char Symbol;
+    char fruits[7];
+    fruits[0]= '@';
+    fruits[1]= '#';
+    fruits[2]= '$';
+    fruits[3]= '^';
+    fruits[4]= '&';
+    fruits[5]= '*';
+    fruits[6]= '+';
+    int p=0;
+    srand(time(0));
+    p = rand();
+	int number;
+	number = p % 7;
+	char ChoseFruit;
+	ChoseFruit = fruits[number];
+
+		switch (ChoseFruit)
+		{
+		case '@':
+			Symbol = '@';
+			break;
+		case '#':
+			Symbol = '#';
+			break;
+		case '$':
+			Symbol = '$';
+			break;
+		case '^':
+			Symbol = '^';
+			break;
+		case '&':
+			Symbol = '&';
+			break;
+		case '*':
+			Symbol = '*';
+			break;
+		case '+':
+			Symbol = '+';
+			break;
+		};
+		return Symbol;
 }
