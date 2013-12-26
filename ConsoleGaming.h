@@ -64,8 +64,8 @@ namespace ConsoleColors
 		Green = 0x2,
 		Red = 0x4,
 		Yellow = 0x6,
-		Purple = 0x5,
-		Cyan = LightBlue | Green,
+		Pink = 0x13,
+		Cyan = 0x3,
 		Black = 0,
 		White = 0x7
 	};
