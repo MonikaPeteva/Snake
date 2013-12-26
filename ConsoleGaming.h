@@ -61,7 +61,7 @@ namespace ConsoleColors
 	{
 		// Color space is ARGB
 		LightBlue = 0x9,
-		Green = 0x2,
+		Green = 0xA,
 		Red = 0x4,
 		Yellow = 0xE,
 		Pink = 0xD,
