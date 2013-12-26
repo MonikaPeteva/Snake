@@ -429,7 +429,7 @@ int QuitGame()
 
         ClearScreen(consoleHandle);
         
-    return 0;
+    exit(0);
 }
 
 COORD GanaratingCoordinations ()
