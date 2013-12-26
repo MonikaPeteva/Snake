@@ -18,16 +18,16 @@ typedef vector<GameObject>::const_iterator const_iterator;
 // Window constants
 const int WindowWidth = 70;
 const int WindowHeight = 25;
-//Растоянията от краищата на прозореца до рамката на игралното поле
 const int BorderX = 3, BorderY = 2;
+
 
 // Snake
 const int SnakeSpeed = 1;
 const int SnakeStartingLength = 5;
 const char SnakeSymbol = '*',
            FruitSymbol = '+',
-		   PoisonSymbol = '-',
-		   WallSymbol = 'X';
+           PoisonSymbol = '-',
+           WallSymbol = 'X';
 
 // Game variables
 unsigned long sleepDuration = 200;
@@ -37,54 +37,30 @@ vector<GameObject> fruit;
 vector<GameObject> poison;
 vector<GameObject> wall;
 
-
 unsigned int Score;
 unsigned int MaxScore = 0;
-
-//За определяне на къде ще върви змията
 COORD direction ;
 
 void Initialization();
 void CenterString(string s);
-void DisplayHighestScore();
 void PrintScore();
-void SaveScore(int score);
-int GetScore();
-COORD GanaratingCoordinations();
-void GeneratingWall ();
-void Draw();
-void Update();
-void Menu();
 void GameInstructions();
+void DisplayHighestScore();
+COORD GanaratingCoordinations();
 void QuitGameOver();
 int  QuitGame();
+void Menu();
+void SaveScore(int score);
+int GetScore();
+void SetDifficulty();
 
-int main()
-{
-	consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE );
-
-	// Randomize stuff
-	srand(time(NULL));
-
-	COORD CurrentCoordinates = GanaratingCoordinations ();
-	fruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol));
-
-	CurrentCoordinates = GanaratingCoordinations ();
-	poison.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol));
-		
-    Menu();
-
-     return 0;
-}
 
 void Update()
 {
         // Save the tail, we might need it later.
         GameObject tail = *(snake.end() - 1);
+                tail.Symbol = ' ';
 
-		tail.Symbol = ' ';
-
-		//местим змията с едно на пред
         for (randomAccess_iterator i = snake.end() - 1; i != snake.begin(); --i)
         {
                 GameObject next = *(i - 1);
@@ -141,129 +117,143 @@ void Update()
 
         GameObject head = *snake.begin();
 
-		head.Draw(consoleHandle);
-		tail.Draw(consoleHandle);
+                head.Draw(consoleHandle);
+                tail.Draw(consoleHandle);
 
-		for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
+
+                for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
         {
                 if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                 {
-                    // Remove the old fruit, increase the snake's size
-                    Score += 5;
-                    PrintScore();
+                        // Remove the old fruit, increase the snake's size
+                        Score += 5;
+                        PrintScore();
 
-                    fruit.erase(i);
+                        fruit.erase(i);
 
-                    snake.push_back(tail);
+                        snake.push_back(tail);
 
-                    tail.Symbol = '*';
-                    tail.Draw(consoleHandle);
-					Beep(700,850);
+                        tail.Symbol = '*';
+                        tail.Draw(consoleHandle);
+						Beep(700,850);
 
-                    // Add a new fruit
-                    COORD CurrentCoordinates = GanaratingCoordinations ();
-                    tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol);
-                    fruit.push_back(tail);
-					tail.Draw(consoleHandle);
+                        // Add a new fruit
+                                                                                                
+                       COORD CurrentCoordinates = GanaratingCoordinations ();
+                       tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol);
+                       fruit.push_back(tail);
+						tail.Draw(consoleHandle);
 
-                    sleepDuration *= (sleepDuration > 50) * 0.1 + 0.9;
 
-                    // Break, since you can't eat more than one fruit at the same time.
-                    break;
+                        sleepDuration *= (sleepDuration > 50) * 0.1 + 0.9;
+
+                        // Break, since you can't eat more than one fruit at the same time.
+                        break;
                 }
 
         }
 
-        for (randomAccess_iterator i = poison.begin(); i != poison.end(); ++i)
+                for (randomAccess_iterator i = poison.begin(); i != poison.end(); ++i)
         {
                 if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                 {
                     // Remove poison and decrease the snake's size
-					if (snake.begin() < snake.end()-1)
-                    {
-						if (Score == 0)   QuitGameOver();
-						else   Score -= 5;
-							
-                        PrintScore();
+						if (snake.begin() < snake.end()-1)
+                            {
+								if (Score == 0)
+								{
+									QuitGameOver();
+								}
+								else
+									Score -= 5;
+                                PrintScore();
 
-						poison.erase(i);
+								poison.erase(i);
 
-                        tail = *(snake.end() - 1);
-                        tail.Symbol = ' ';
-                        tail.Draw(consoleHandle);
-
-						snake.erase(snake.end() - 1);
-						Beep(220,800);
-
-						// Add a new poisonous fruit
-                        COORD CurrentCoordinates = GanaratingCoordinations ();;
-                        tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol);
-                        poison.push_back(tail);
-                        tail.Draw(consoleHandle);
-
-                        // Break, since you can't eat more than one fruit at the same time.
-						break;
-					}
-                    else   QuitGameOver();	
-                }
-        }
-
-		//if the snake crosses itself
-		for (randomAccess_iterator i = snake.begin() + 1; i != snake.end(); ++i)
-        {
-				if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
-                {
-					tail.Symbol = ' ';
-					tail.Draw(consoleHandle);
-					i->Symbol = '*';
-					i->Color = 0x4;
-					i->Draw(consoleHandle);
-
-                    QuitGameOver();
-                }
-
-        }
-
-        //if the snake touches one of the borders
-        for (randomAccess_iterator i = wall.begin(); i != wall.end(); ++i)
-		{
-                if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
-					{
+                                tail = *(snake.end() - 1);
                                 tail.Symbol = ' ';
                                 tail.Draw(consoleHandle);
-                                i->Symbol = '*';
-                                i->Color = 0x4;
-                                i->Draw(consoleHandle);
 
+								snake.erase(snake.end() - 1);
+								Beep(220,800);
+
+                        // Add a new poisonous fruit
+                                                
+                                COORD CurrentCoordinates = GanaratingCoordinations ();;
+                                tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol);
+                                poison.push_back(tail);
+                                tail.Draw(consoleHandle);
+
+
+                       // Break, since you can't eat more than one fruit at the same time.
+								break;
+							}
+                      else
+                            {
 								QuitGameOver();
-					}
+                            }
+                }
 
-		}
+        }
+
+                //if the snake touches one of the borders
+                for (randomAccess_iterator i = wall.begin(); i != wall.end(); ++i)
+				{
+                       if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
+							{
+                                        tail.Symbol = ' ';
+                                        tail.Draw(consoleHandle);
+                                        i->Symbol = '*';
+                                        i->Color = 0x4;
+                                        i->Draw(consoleHandle);
+										QuitGameOver();
+							}
+
+				}
+
+
+				//if the snake crosses itself
+                for (randomAccess_iterator i = snake.begin() + 1; i != snake.end(); ++i)
+				{
+                       if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
+							{
+                                        tail.Symbol = ' ';
+                                        tail.Draw(consoleHandle);
+                                        i->Symbol = '*';
+                                        i->Color = 0x4;
+                                        i->Draw(consoleHandle);
+										QuitGameOver();
+							}
+
+				}
 }
 
 void Draw()
 {
-		PrintScore();
-		for (const_iterator snakeBody = snake.begin(); snakeBody != snake.end(); ++snakeBody)
-		{
-				snakeBody->Draw(consoleHandle);
-		}
+        PrintScore();
+		CenterString("\nPress ESC to quit game and return to the main menu\n");
 
-		for (const_iterator singleFruit = fruit.begin(); singleFruit != fruit.end(); ++singleFruit)
-		{
-				singleFruit->Draw(consoleHandle);
-		}
+        for (const_iterator snakeBody = snake.begin(); snakeBody != snake.end(); ++snakeBody)
+        {
+                snakeBody->Draw(consoleHandle);
+        }
 
-		for (const_iterator singlePoison = poison.begin(); singlePoison != poison.end(); ++singlePoison)
-		{
-				singlePoison->Draw(consoleHandle);
-		}
+        for (const_iterator singleFruit = fruit.begin(); singleFruit != fruit.end(); ++singleFruit)
+        {
+                singleFruit->Draw(consoleHandle);
+        }
 
-		for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)
-		{
-				brick->Draw(consoleHandle);
-		}
+                for (const_iterator singlePoison = poison.begin(); singlePoison != poison.end(); ++singlePoison)
+        {
+                singlePoison->Draw(consoleHandle);
+        }
+
+                for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)
+        {
+                brick->Draw(consoleHandle);
+        }
 }
+
 
 void Menu()
 {
@@ -282,54 +272,82 @@ void Menu()
         CenterString("1. Play New Game\n");
         CenterString("2. See Game Instructions\n");
         CenterString("3. See Highest Score\n");
-        CenterString("4. Exit Game\n");
+		CenterString("4. Difficulty Settings\n");
+        CenterString("5. Exit Game\n");
 
 		Beep(520,300);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of border
         
-		cout << "      _    _" << endl;
-		cout << "   ,-(|)--(|)-." << endl;
-		cout << "   \_   ..   _/" << endl;
-		cout << "     \______/"<<endl;
-		cout << "       V  V                                  ____" << endl;
-		cout << "       `.^^`.                               /^,--`" << endl;
-		cout << "         \^^^\                             (^^\\" << endl;
-		cout << "         |^^^|                  _,-._       \^^\\"<< endl;
-		cout << "        (^^^^\      __      _,-'^^^^^`.    _,'^^)"<< endl;
-		cout << "         \^^^^`._,-'^^`-._.'^^^^__^^^^ `--'^^^_/"<< endl;
-		cout << "          \^^^^^ ^^^_^^^^^^^_,-'  `.^^^^^^^^_/"<< endl;
-		cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
+cout << "      _    _" << endl;
+cout << "   ,-(|)--(|)-." << endl;
+cout << "   \_   ..   _/" << endl;
+cout << "     \______/"<<endl;
+cout << "       V  V                                  ____" << endl;
+cout << "       `.^^`.                               /^,--`" << endl;
+cout << "         \^^^\                             (^^\\" << endl;
+cout << "         |^^^|                  _,-._       \^^\\"<< endl;
+cout << "        (^^^^\      __      _,-'^^^^^`.    _,'^^)"<< endl;
+cout << "         \^^^^`._,-'^^`-._.'^^^^__^^^^ `--'^^^_/"<< endl;
+cout << "          \^^^^^ ^^^_^^^^^^^_,-'  `.^^^^^^^^_/"<< endl;
+cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
 
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 
         char k = getch();
         switch(k)
         {
-        case '1':
+        case '1':  
+			//play new game
 				Beep(520,200);
                 ClearScreen(consoleHandle);
                 Initialization();
                 Draw();
                 while (true)
-                {
+                   {
                         Update();
 						Sleep(sleepDuration);
-                }
+                   }
                 break;
-        case '2':
+        case '2':  
+			//see instructions
 				Beep(520,200);
                 ClearScreen(consoleHandle);
                 GameInstructions();
                 break;
-        case '3':
+        case '3': 
+			//see highest score
 				Beep(520,200);
                 ClearScreen(consoleHandle);
                 DisplayHighestScore();
                 break;
-        case '4':
+		case '4':
+			Beep(520,200);
+			ClearScreen(consoleHandle);
+			SetDifficulty();
+			break;
+        case '5': 
+			//quit game
 				Beep(520,200);
                 QuitGame();
         }
+}
+
+
+int main()
+{
+        consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE );
+        // Randomize stuff
+
+		srand(time(NULL));
+        COORD CurrentCoordinates = GanaratingCoordinations ();
+        fruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol));
+
+        CurrentCoordinates = GanaratingCoordinations ();
+        poison.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol));
+                
+        Menu();
+
+        return 0;
 }
 
 void GeneratingWall (int WindowWidth, int WindowHeight)
@@ -394,9 +412,12 @@ void GameInstructions()
 
 void QuitGameOver()
 {
-        if (MaxScore < Score) MaxScore = Score;
+        if (MaxScore < Score) 
+			{
+				MaxScore = Score;
+			}
 
-		int score = GetScore(); //Това е глобална променлива не излизаме от цялото приложение и няма нужда да се записва във файл 
+		int score = GetScore();   //before quitting the game, check if highest score should be updated
 		if ( MaxScore > score )
 		{
 			SaveScore(MaxScore);
@@ -426,18 +447,19 @@ void QuitGameOver()
 
 int QuitGame()
 {
+		//before quitting the game, check if highest score should be updated
 		int score = GetScore();
 		if ( MaxScore > score )
 		{
 			SaveScore(MaxScore);
 		}
 
-		ClearScreen(consoleHandle);
+        ClearScreen(consoleHandle);
         
-		exit(0);
+    exit(0);
 }
 
-COORD GanaratingCoordinations () //Може да се добави кординатите да не са върху змията и другите плодчета
+COORD GanaratingCoordinations ()
 {
         COORD momental;
         momental.X = rand() % (WindowWidth-2*(BorderX+1))+BorderX+1;
@@ -452,16 +474,16 @@ void Initialization ()
         direction.Y = 0;
 
         while(snake.begin() != snake.end())
-		{
-			snake.erase(snake.end() - 1);
-		}
+			{
+				snake.erase(snake.end() - 1);
+			}
 
         for (int i = SnakeStartingLength-1; i > -1; --i)
         {
-			snake.push_back(GameObject(i+BorderX+1, BorderY+1, SnakeSymbol));
+                        snake.push_back(GameObject(i+BorderX+1, BorderY+1, SnakeSymbol));
         }
 
-		GeneratingWall (WindowWidth, WindowHeight);
+                GeneratingWall (WindowWidth, WindowHeight);
 }
 
 void PrintScore()
@@ -470,7 +492,7 @@ void PrintScore()
         GameObject current (0,0,' ');
         current.Color = 0x2;
         current.Draw(consoleHandle);
-        text = "Highest Score This Session: " + to_string(MaxScore) + "        Score: " + to_string(Score);
+        text = "Highest Score This Session: " +  to_string(MaxScore) + "        Score: " + to_string(Score);
         CenterString(text);
         current.Color = 15;
 }
@@ -490,16 +512,13 @@ int GetScore() //reads score from scores.txt
 	ifstream i_ScoreFile("scores.txt");
 		int current_high_score = 0;
 		if (i_ScoreFile.is_open())
-		{
-			while (!i_ScoreFile.eof())
 			{
 				i_ScoreFile >> current_high_score;
 			}
-		}
 		return current_high_score;
 }
 
-void DisplayHighestScore() //Тук ти забива
+void DisplayHighestScore()
 {
 		string border (WindowWidth, ':');
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
@@ -522,4 +541,60 @@ void DisplayHighestScore() //Тук ти забива
                 ClearScreen(consoleHandle);
                 Menu();
         }
+}
+
+void SetDifficulty()
+{
+	string border (WindowWidth, ':');
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+	cout << border << endl;
+	cout << border << endl;
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+	cout << "\n\n";
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
+    CenterString("Select Difficulty Level: \n\n");
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+    CenterString("1. Easy\n");
+    CenterString("2. Normal\n");
+	CenterString("3. Hard\n");
+	CenterString("4. Suicide\n\n");
+
+	CenterString("Press 'ESC' to get back to the main menu\n\n\n");
+
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+	cout << border << endl;
+	cout << border << endl;
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+
+	char k = getch();
+        switch(k)
+        {
+        case '1':
+			sleepDuration = 400;
+			ClearScreen(consoleHandle);
+            SetDifficulty();
+			break;
+		case '2':
+			sleepDuration = 200;
+			ClearScreen(consoleHandle);
+			SetDifficulty();
+			break;
+		case '3':
+			sleepDuration = 100;
+			ClearScreen(consoleHandle);
+			SetDifficulty();
+			break;
+		case '4':
+			sleepDuration = 50;
+			ClearScreen(consoleHandle);
+            SetDifficulty();
+			break;
+		case 27:
+            ClearScreen(consoleHandle);
+            Menu();
+			break;
+        }
+	
 }
