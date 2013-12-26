@@ -44,9 +44,13 @@ unsigned int MaxScore = 0;
 //За определяне на къде ще върви змията
 COORD direction ;
 
+void Menu();
+void GameInstructions();
+void DisplayHighestScore();
+int  QuitGame();
+
 void Initialization();
 void CenterString(string s);
-void DisplayHighestScore();
 void PrintScore();
 void SaveScore(int score);
 int GetScore();
@@ -54,10 +58,8 @@ COORD GanaratingCoordinations();
 void GeneratingWall ();
 void Draw();
 void Update();
-void Menu();
-void GameInstructions();
 void QuitGameOver();
-int  QuitGame();
+
 
 int main()
 {
@@ -76,6 +78,148 @@ int main()
 
      return 0;
 }
+
+void Menu()
+{
+		string border (WindowWidth, ':');
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+		cout << "\n\n";
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
+        CenterString("Welcome to SNAKE GAME 1.0!\n\n");
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+        CenterString("Choose action:\n");
+		cout << endl;
+        CenterString("1. Play New Game\n");
+        CenterString("2. See Game Instructions\n");
+        CenterString("3. See Highest Score\n");
+        CenterString("4. Exit Game\n");
+
+		Beep(520,300);
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of border
+        
+		cout << "      _    _" << endl;
+		cout << "   ,-(|)--(|)-." << endl;
+		cout << "   \_   ..   _/" << endl;
+		cout << "     \______/"<<endl;
+		cout << "       V  V                                  ____" << endl;
+		cout << "       `.^^`.                               /^,--`" << endl;
+		cout << "         \^^^\                             (^^\\" << endl;
+		cout << "         |^^^|                  _,-._       \^^\\"<< endl;
+		cout << "        (^^^^\      __      _,-'^^^^^`.    _,'^^)"<< endl;
+		cout << "         \^^^^`._,-'^^`-._.'^^^^__^^^^ `--'^^^_/"<< endl;
+		cout << "          \^^^^^ ^^^_^^^^^^^_,-'  `.^^^^^^^^_/"<< endl;
+		cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+        char k = getch();
+        switch(k)
+        {
+        case '1':
+				Beep(520,200);
+                ClearScreen(consoleHandle);
+                Initialization();
+                Draw();
+                while (true)
+                {
+                        Update();
+						Sleep(sleepDuration);
+                }
+                break;
+        case '2':
+				Beep(520,200);
+                ClearScreen(consoleHandle);
+                GameInstructions();
+                break;
+        case '3':
+				Beep(520,200);
+                ClearScreen(consoleHandle);
+                DisplayHighestScore();
+                break;
+        case '4':
+				Beep(520,200);
+                QuitGame();
+        }
+}
+
+void GameInstructions()
+{
+	string border (WindowWidth, ':');
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		cout << "\n\n";
+
+
+        CenterString("Here are the rules:\n\n");
+        CenterString("You control the snake.\n");
+		CenterString("When it eats one of the fruits, the snake grows longer.\n");
+		CenterString("When it eats one of the poisonous fruits, the snake gets shorter.\n");
+		CenterString("Your goal is to make the snake as long as possible.\n");
+        CenterString("If the snake crosses itself or bumps into a border, it dies.\n\n");
+        CenterString("To go FORWARD press 'w'\n");
+        CenterString("To go BACK press 's'\n");
+        CenterString("To turn RIGHT press 'd'\n");
+        CenterString("To turn LEFT press 'a'\n\n");
+        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+        char k = getch();
+        if (k == ESC)  //return to main menu if ESC is pressed
+        {
+                ClearScreen(consoleHandle);
+                Menu();
+        }
+}
+
+void DisplayHighestScore() //Тук ти забива
+{
+		string border (WindowWidth, ':');
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		cout << "\n\n";
+
+		CenterString("Highest score: " + to_string(GetScore()) + "\n\n");
+        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+		cout << border << endl;
+		cout << border << endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+        char k = getch();
+        if (k == ESC)
+        {
+                ClearScreen(consoleHandle);
+                Menu();
+        }
+}
+
+int QuitGame()
+{
+		int score = GetScore();
+		if ( MaxScore > score )
+		{
+			SaveScore(MaxScore);
+		}
+
+		ClearScreen(consoleHandle);
+        
+		exit(0);
+}
+
+
 
 void Update()
 {
@@ -265,73 +409,6 @@ void Draw()
 		}
 }
 
-void Menu()
-{
-		string border (WindowWidth, ':');
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
-		cout << border << endl;
-		cout << border << endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-
-		cout << "\n\n";
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
-        CenterString("Welcome to SNAKE GAME 1.0!\n\n");
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-        CenterString("Choose action:\n");
-		cout << endl;
-        CenterString("1. Play New Game\n");
-        CenterString("2. See Game Instructions\n");
-        CenterString("3. See Highest Score\n");
-        CenterString("4. Exit Game\n");
-
-		Beep(520,300);
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of border
-        
-		cout << "      _    _" << endl;
-		cout << "   ,-(|)--(|)-." << endl;
-		cout << "   \_   ..   _/" << endl;
-		cout << "     \______/"<<endl;
-		cout << "       V  V                                  ____" << endl;
-		cout << "       `.^^`.                               /^,--`" << endl;
-		cout << "         \^^^\                             (^^\\" << endl;
-		cout << "         |^^^|                  _,-._       \^^\\"<< endl;
-		cout << "        (^^^^\      __      _,-'^^^^^`.    _,'^^)"<< endl;
-		cout << "         \^^^^`._,-'^^`-._.'^^^^__^^^^ `--'^^^_/"<< endl;
-		cout << "          \^^^^^ ^^^_^^^^^^^_,-'  `.^^^^^^^^_/"<< endl;
-		cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
-
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-
-        char k = getch();
-        switch(k)
-        {
-        case '1':
-				Beep(520,200);
-                ClearScreen(consoleHandle);
-                Initialization();
-                Draw();
-                while (true)
-                {
-                        Update();
-						Sleep(sleepDuration);
-                }
-                break;
-        case '2':
-				Beep(520,200);
-                ClearScreen(consoleHandle);
-                GameInstructions();
-                break;
-        case '3':
-				Beep(520,200);
-                ClearScreen(consoleHandle);
-                DisplayHighestScore();
-                break;
-        case '4':
-				Beep(520,200);
-                QuitGame();
-        }
-}
-
 void GeneratingWall (int WindowWidth, int WindowHeight)
 {
         for (int x = BorderX; x <= WindowWidth-BorderX; ++x)
@@ -346,7 +423,6 @@ void GeneratingWall (int WindowWidth, int WindowHeight)
         }
 }
 
-
 void CenterString(string str)
 {
         int l = str.length();
@@ -355,42 +431,6 @@ void CenterString(string str)
                 cout << " ";
         cout << str;
 }
-
-void GameInstructions()
-{
-	string border (WindowWidth, ':');
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
-		cout << border << endl;
-		cout << border << endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		cout << "\n\n";
-
-
-        CenterString("Here are the rules:\n\n");
-        CenterString("You control the snake.\n");
-		CenterString("When it eats one of the fruits, the snake grows longer.\n");
-		CenterString("When it eats one of the poisonous fruits, the snake gets shorter.\n");
-		CenterString("Your goal is to make the snake as long as possible.\n");
-        CenterString("If the snake crosses itself or bumps into a border, it dies.\n\n");
-        CenterString("To go FORWARD press 'w'\n");
-        CenterString("To go BACK press 's'\n");
-        CenterString("To turn RIGHT press 'd'\n");
-        CenterString("To turn LEFT press 'a'\n\n");
-        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
-
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
-		cout << border << endl;
-		cout << border << endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-
-        char k = getch();
-        if (k == ESC)  //return to main menu if ESC is pressed
-        {
-                ClearScreen(consoleHandle);
-                Menu();
-        }
-}
-
 
 void QuitGameOver()
 {
@@ -422,19 +462,6 @@ void QuitGameOver()
         char k = getch();
         ClearScreen(consoleHandle);
         Menu();
-}
-
-int QuitGame()
-{
-		int score = GetScore();
-		if ( MaxScore > score )
-		{
-			SaveScore(MaxScore);
-		}
-
-		ClearScreen(consoleHandle);
-        
-		exit(0);
 }
 
 COORD GanaratingCoordinations () //Може да се добави кординатите да не са върху змията и другите плодчета
@@ -499,27 +526,3 @@ int GetScore() //reads score from scores.txt
 		return current_high_score;
 }
 
-void DisplayHighestScore() //Тук ти забива
-{
-		string border (WindowWidth, ':');
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
-		cout << border << endl;
-		cout << border << endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		cout << "\n\n";
-
-		CenterString("Highest score: " + to_string(GetScore()) + "\n\n");
-        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
-
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
-		cout << border << endl;
-		cout << border << endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-
-        char k = getch();
-        if (k == ESC)
-        {
-                ClearScreen(consoleHandle);
-                Menu();
-        }
-}
