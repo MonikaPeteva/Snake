@@ -29,6 +29,7 @@ const char SnakeSymbol = '*',
 	WallSymbol = 'X',
 	PoisonSymbol = '-';
 char FruitSymbol;
+ConsoleColor ColorOfFruit;
 
 // Game variables
 unsigned long sleepDuration = 200;
@@ -70,8 +71,14 @@ int main()
         COORD CurrentCoordinates = GanaratingCoordinations();
         fruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol));
 
+		for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
+			{
+				i->Color= ColorOfFruit ;
+			}
+
         CurrentCoordinates = GanaratingCoordinations ();
         poison.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol));
+		
                 
         Menu();
 
@@ -368,6 +375,12 @@ void Update()
 						FruitSymbol = RandomizeFruitSymbol();
                        tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol);
                        fruit.push_back(tail);
+
+					   for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
+					{
+						tail.Color= ColorOfFruit;
+					}
+
                        tail.Draw(consoleHandle);
 
 
@@ -421,6 +434,8 @@ void Update()
                 }
 
         }
+
+				 
 
                 //if the snake touches one of the borders
                 for (randomAccess_iterator i = wall.begin(); i != wall.end(); ++i)
@@ -635,24 +650,31 @@ char RandomizeFruitSymbol()
                 {
                 case '@':
                         Symbol = '@';
+						ColorOfFruit = LightBlue;
                         break;
                 case '#':
                         Symbol = '#';
+						ColorOfFruit = Green;
                         break;
                 case '$':
                         Symbol = '$';
+						ColorOfFruit = Red;
                         break;
                 case '^':
                         Symbol = '^';
+						ColorOfFruit = Pink;
                         break;
                 case '&':
                         Symbol = '&';
+						ColorOfFruit = Cyan;
                         break;
                 case '*':
                         Symbol = '*';
+						ColorOfFruit = White;
                         break;
                 case '+':
                         Symbol = '+';
+						ColorOfFruit = Green;
                         break;
                 };
                 return Symbol;
