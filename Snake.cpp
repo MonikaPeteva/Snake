@@ -27,10 +27,12 @@ const int SnakeSpeed = 1;
 const int SnakeStartingLength = 5;
 const char SnakeSymbol = '*',
         WallSymbol = 'X',
-        PoisonSymbol = '-';
+        PoisonSymbol = '-',
+		X_Element = 'X';
 char FruitSymbol;
 int Points;
 ConsoleColor ColorOfFruit;
+ConsoleColor ColorOfX_Element;
 
 // Game variables
 unsigned long sleepDuration = 200;
@@ -39,6 +41,7 @@ vector<GameObject> snake;
 vector<GameObject> fruit;
 vector<GameObject> poison;
 vector<GameObject> wall;
+vector<GameObject> x_element;
 
 unsigned int Score = 0;
 unsigned int MaxScore = 0;
@@ -82,7 +85,14 @@ int main()
         CurrentCoordinates = GeneratingCoordinations ();
         poison.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol));
                 
-                
+         CurrentCoordinates = GeneratingCoordinations ();
+		 x_element.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, X_Element));
+
+		 for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
+                        {
+                                i->Color= Red;
+                        }
+                       
         Menu();
 
         return 0;
@@ -276,6 +286,11 @@ void Draw()
                 singlePoison->Draw(consoleHandle);
         }
 
+				for (const_iterator singlex_element = x_element.begin(); singlex_element != x_element.end(); ++singlex_element)
+        {
+                singlex_element->Draw(consoleHandle);
+        }
+
                 for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)
         {
                 brick->Draw(consoleHandle);
@@ -419,6 +434,7 @@ void Update()
                                 tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol);
                                 poison.push_back(tail);
                                 tail.Draw(consoleHandle);
+						
 
 
                        // Break, since you can't eat more than one fruit at the same time.
@@ -452,6 +468,21 @@ void Update()
 
                                 //if the snake crosses itself
                 for (randomAccess_iterator i = snake.begin() + 1; i != snake.end(); ++i)
+                                {
+                       if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
+                                                        {
+                                        tail.Symbol = ' ';
+                                        tail.Draw(consoleHandle);
+                                        i->Symbol = '*';
+                                        i->Color = Red;
+                                        i->Draw(consoleHandle);
+                                                                                QuitGameOver();
+                                                        }
+
+                                }
+
+				 //if the snake crosses X_Element
+				for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
                                 {
                        if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                                                         {
