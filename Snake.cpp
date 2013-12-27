@@ -29,6 +29,7 @@ const char SnakeSymbol = '*',
 	WallSymbol = 'X',
 	PoisonSymbol = '-';
 char FruitSymbol;
+int Points;
 ConsoleColor ColorOfFruit;
 
 // Game variables
@@ -357,7 +358,7 @@ void Update()
                 if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                 {
                         // Remove the old fruit, increase the snake's size
-                        Score += 5;
+                        Score += Points;
                         PrintScore();
 
                         fruit.erase(i);
@@ -651,30 +652,37 @@ char RandomizeFruitSymbol()
                 case '@':
                         Symbol = '@';
 						ColorOfFruit = LightBlue;
+						Points = 2;
                         break;
                 case '#':
                         Symbol = '#';
 						ColorOfFruit = Green;
+						Points = 4;
                         break;
                 case '$':
                         Symbol = '$';
 						ColorOfFruit = Red;
+						Points = 6;
                         break;
                 case '^':
                         Symbol = '^';
 						ColorOfFruit = Pink;
+						Points = 8;
                         break;
                 case '&':
                         Symbol = '&';
 						ColorOfFruit = Cyan;
+						Points = 10;
                         break;
                 case '*':
                         Symbol = '*';
 						ColorOfFruit = White;
+						Points = 12;
                         break;
                 case '+':
                         Symbol = '+';
 						ColorOfFruit = Green;
+						Points = 14;
                         break;
                 };
                 return Symbol;
