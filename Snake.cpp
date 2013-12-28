@@ -28,7 +28,9 @@ const int SnakeStartingLength = 5;
 const char SnakeSymbol = '*',
         WallSymbol = 'X',
         PoisonSymbol = '-',
-		X_Element = 'X';
+		X_Element = 'X',
+		PowerUpFruit = 'O';
+
 char FruitSymbol;
 int Points;
 ConsoleColor ColorOfFruit;
@@ -42,6 +44,7 @@ vector<GameObject> fruit;
 vector<GameObject> poison;
 vector<GameObject> wall;
 vector<GameObject> x_element;
+vector<GameObject> powerUpFruit;
 
 unsigned int Score = 0;
 unsigned int MaxScore = 0;
@@ -87,6 +90,11 @@ int main()
                 
          CurrentCoordinates = GeneratingCoordinations ();
 		 x_element.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, X_Element));
+
+		 CurrentCoordinates = GeneratingCoordinations ();
+		 powerUpFruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpFruit));
+
+
 
 		 for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
                         {
@@ -281,17 +289,22 @@ void Draw()
                 singleFruit->Draw(consoleHandle);
         }
 
-                for (const_iterator singlePoison = poison.begin(); singlePoison != poison.end(); ++singlePoison)
+        for (const_iterator singlePoison = poison.begin(); singlePoison != poison.end(); ++singlePoison)
         {
                 singlePoison->Draw(consoleHandle);
         }
 
-				for (const_iterator singlex_element = x_element.begin(); singlex_element != x_element.end(); ++singlex_element)
+		for (const_iterator singlex_element = x_element.begin(); singlex_element != x_element.end(); ++singlex_element)
         {
                 singlex_element->Draw(consoleHandle);
         }
 
-                for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)
+		for (const_iterator singlePowerUpFruit = powerUpFruit.begin(); singlePowerUpFruit != powerUpFruit.end(); ++singlePowerUpFruit)
+        {
+                singlePowerUpFruit->Draw(consoleHandle);
+        }
+
+        for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)
         {
                 brick->Draw(consoleHandle);
         }
@@ -495,6 +508,25 @@ void Update()
                                                         }
 
                                 }
+
+				//if the snake crosses PowerUpFruit
+				for (randomAccess_iterator i = powerUpFruit.begin(); i != powerUpFruit.end(); ++i)
+				{
+						if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
+						{
+							tail.Symbol = ' ';
+                            tail.Draw(consoleHandle);
+                            i->Symbol = '*';
+
+							 COORD CurrentCoordinates = GeneratingCoordinations ();
+							 tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpFruit);
+							 powerUpFruit.push_back(tail);
+                             tail.Draw(consoleHandle);
+							 sleepDuration -= 50;
+							 break;
+						}
+				}
+				
 }
 
 void GeneratingWall ()
@@ -664,13 +696,13 @@ void QuitGameOver()
         current.Draw(consoleHandle);
 
         cout<<"\n";
-        cout<<" #     #                  #                            \n";
-        cout<<"  #   #   ####  #    #    #        ####   ####  ###### \n";
-        cout<<"   # #   #    # #    #    #       #    # #      #      \n";
-        cout<<"    #    #    # #    #    #       #    #  ####  #####  \n";
-        cout<<"    #    #    # #    #    #       #    #      # #      \n";
-        cout<<"    #    #    # #    #    #       #    # #    # #      \n";
-        cout<<"    #     ####   ####     #######  ####   ####  ###### \n";
+        cout<<"    #     #                  #                            \n";
+        cout<<"     #   #   ####  #    #    #        ####   ####  ###### \n";
+        cout<<"      # #   #    # #    #    #       #    # #      #      \n";
+        cout<<"       #    #    # #    #    #       #    #  ####  #####  \n";
+        cout<<"       #    #    # #    #    #       #    #      # #      \n";
+        cout<<"       #    #    # #    #    #       #    # #    # #      \n";
+        cout<<"       #     ####   ####     #######  ####   ####  ###### \n";
         
         GameObject tail = *(snake.end() - 1);
         tail.Draw(consoleHandle);
@@ -713,7 +745,7 @@ char RandomizeFruitSymbol()
                         break;
                 case '$':
                         Symbol = '$';
-                                                ColorOfFruit = Red;
+						ColorOfFruit = LightBlue;
                                                 Points = 6;
                         break;
                 case '^':
