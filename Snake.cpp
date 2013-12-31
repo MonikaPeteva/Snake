@@ -32,7 +32,11 @@ const char SnakeSymbol = '*',
 		PowerUpFruit = 'O';
 
 char FruitSymbol;
-int Points;
+int Points,
+	Counter = 0,
+	ArrayCoordinatesX[WindowWidth],
+	ArrayCoordinatesY[WindowHeight];
+
 ConsoleColor ColorOfFruit;
 ConsoleColor ColorOfX_Element;
 
@@ -88,8 +92,6 @@ int main()
         CurrentCoordinates = GeneratingCoordinations ();
         poison.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol));
                 
-         CurrentCoordinates = GeneratingCoordinations ();
-		 x_element.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, X_Element));
 
 		 CurrentCoordinates = GeneratingCoordinations ();
 		 powerUpFruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpFruit));
@@ -294,11 +296,6 @@ void Draw()
                 singlePoison->Draw(consoleHandle);
         }
 
-		for (const_iterator singlex_element = x_element.begin(); singlex_element != x_element.end(); ++singlex_element)
-        {
-                singlex_element->Draw(consoleHandle);
-        }
-
 		for (const_iterator singlePowerUpFruit = powerUpFruit.begin(); singlePowerUpFruit != powerUpFruit.end(); ++singlePowerUpFruit)
         {
                 singlePowerUpFruit->Draw(consoleHandle);
@@ -312,6 +309,7 @@ void Draw()
 
 void Update()
 {
+	Counter++;
         // Save the tail, we might need it later.
 				GameObject tail = *(snake.end() - 1);
                 tail.Symbol = ' ';
@@ -527,6 +525,42 @@ void Update()
 						}
 				}
 				
+				if (Counter % 100 == 0)
+				{
+					 
+					 COORD CurrentCoordinates = GeneratingCoordinations ();
+					 tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, X_Element);
+					 x_element.push_back(tail);
+					 for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
+                        {
+                                tail.Color = Red;
+                        }
+					 tail.Draw(consoleHandle);
+					 ArrayCoordinatesX[CurrentCoordinates.X] = CurrentCoordinates.X;
+					 ArrayCoordinatesY[CurrentCoordinates.Y] = CurrentCoordinates.Y;
+					 
+				}
+
+				for (int i = 0; i < WindowWidth; ++i)
+				{
+					for (int j = 0; j < WindowHeight; ++j)
+					{
+						//if the snake crosses X_Element
+						for (randomAccess_iterator k = x_element.begin(); k != x_element.end(); ++k)
+                        {
+							  if (head.Coordinates.X == ArrayCoordinatesX[i] && head.Coordinates.Y == ArrayCoordinatesY[j])
+                                                        {
+                                        tail.Symbol = ' ';
+                                        tail.Draw(consoleHandle);
+                                        k->Symbol = '*';
+                                        k->Color = Red;
+                                        k->Draw(consoleHandle);
+                                                                                QuitGameOver();
+                                                        }
+
+                           }
+					}
+				}
 }
 
 void GeneratingWall ()
