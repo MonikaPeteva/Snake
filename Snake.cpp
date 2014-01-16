@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include "ConsoleGaming.h"
+#include <mmsystem.h>
 
 using namespace std;
 using namespace ConsoleColors;
@@ -26,16 +27,21 @@ const int BorderX = 3, BorderY = 2;
 const int SnakeSpeed = 1;
 const int SnakeStartingLength = 5;
 const char SnakeSymbol = '*',
-        WallSymbol = 'X',
-        PoisonSymbol = '-',
-		X_Element = 'X',
-		PowerUpFruit = 'O';
+WallSymbol = 'X',
+PoisonSymbol = '-',
+X_Element = 'X',
+PowerUpFruit = 'O';
 
 char FruitSymbol;
+double LevelPointsRatio = 1;
+unsigned int Level = 1,
+	StartSleep = 200,
+	X_ElementGenerationSpeed = 100;
 int Points,
-	Counter = 0,
-	ArrayCoordinatesX[WindowWidth],
-	ArrayCoordinatesY[WindowHeight];
+Counter = 0,
+
+ArrayCoordinatesX[WindowWidth],
+ArrayCoordinatesY[WindowHeight];
 
 ConsoleColor ColorOfFruit;
 ConsoleColor ColorOfX_Element;
@@ -50,8 +56,9 @@ vector<GameObject> wall;
 vector<GameObject> x_element;
 vector<GameObject> powerUpFruit;
 
-unsigned int Score = 0;
-unsigned int MaxScore = 0;
+unsigned int Score = 0,
+	InitialScore = 0, // used to keep track of how much Score has increased
+	MaxScore = 0;
 COORD direction ;
 
 void Menu();
@@ -61,12 +68,13 @@ int  QuitGame();
 void Initialization();
 void Draw();
 void Update();
-void GeneratingWall ();
+void GeneratingWall();
 COORD GeneratingCoordinations();
 void CenterString(string s);
-void PrintScore();
+void PrintScoreAndLevel();
 void SaveScore(int score);
 int GetScore();
+void LevelUp();
 void SetDifficulty();
 void QuitGameOver();
 char RandomizeFruitSymbol();
@@ -93,16 +101,20 @@ int main()
         poison.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol));
                 
 
-		 CurrentCoordinates = GeneratingCoordinations ();
-		 powerUpFruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpFruit));
+                 CurrentCoordinates = GeneratingCoordinations ();
+                 powerUpFruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpFruit));
 
 
 
-		 for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
+                 for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
                         {
                                 i->Color= Red;
                         }
-                       
+        
+		int replay_song_number = 5;
+		for (int i = 1; i <= replay_song_number; ++i)
+		{PlaySound(TEXT("ost.wav"), NULL, SND_ASYNC);}
+
         Menu();
 
         return 0;
@@ -111,7 +123,7 @@ int main()
 void Menu()
 {
                 string border (WindowWidth, ':');
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of menu border
                 cout << border << endl;
                 cout << border << endl;
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
@@ -129,7 +141,7 @@ void Menu()
         CenterString("5. Exit Game\n");
 
                 Beep(520,300);
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of border
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of menu border
         
 cout << "      _    _" << endl;
 cout << "   ,-(|)--(|)-." << endl;
@@ -155,6 +167,7 @@ cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
                 ClearScreen(consoleHandle);
                 Initialization();
                 Draw();
+
                 while (true)
                    {
                         Update();
@@ -168,12 +181,12 @@ cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
                 GameInstructions();
                 break;
         case '3': 
-                        //see highest score
-                                Beep(520,200);
+                //see highest score
+                Beep(520,200);
                 ClearScreen(consoleHandle);
                 DisplayHighestScore();
                 break;
-		case '4':
+                case '4':
                 Beep(520,200);
                 ClearScreen(consoleHandle);
                 SetDifficulty();
@@ -223,7 +236,7 @@ void GameInstructions()
 void DisplayHighestScore() //show highest score achieved to date
 {
                 string border (WindowWidth, ':');
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of menu border
                 cout << border << endl;
                 cout << border << endl;
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
@@ -232,7 +245,7 @@ void DisplayHighestScore() //show highest score achieved to date
                 CenterString("Highest score: " + to_string(GetScore()) + "\n\n");
         CenterString("Press 'ESC' to get back to the main menu\n\n\n");
 
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of menu border
                 cout << border << endl;
                 cout << border << endl;
                 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
@@ -248,7 +261,7 @@ void DisplayHighestScore() //show highest score achieved to date
 int QuitGame()
 {
                 //before quitting the game, check if highest score should be updated
-		UpdateHighestScore();
+                UpdateHighestScore();
         ClearScreen(consoleHandle);
         
     exit(0);
@@ -257,6 +270,7 @@ int QuitGame()
 void Initialization ()
 {
         Score = 0;
+		Level = 1;
         direction.X = 1;
         direction.Y = 0;
 
@@ -268,8 +282,8 @@ void Initialization ()
         for (int i = SnakeStartingLength-1; i > -1; --i)
         {
                         snake.push_back(GameObject(i+BorderX+1, BorderY+1, SnakeSymbol));
-                                                for (randomAccess_iterator i = snake.begin(); i != snake.end(); ++i)
-                                                        i->Color = Green;
+                        for (randomAccess_iterator i = snake.begin(); i != snake.end(); ++i)
+                                i->Color = Green;
         }
 
         GeneratingWall ();
@@ -277,8 +291,8 @@ void Initialization ()
 
 void Draw()
 {
-        PrintScore();
-		cout << "\n";
+        PrintScoreAndLevel();
+                cout << "\n";
         CenterString("Press 'K' to save game and ESC to quit and return to the main menu\n");
 
         for (const_iterator snakeBody = snake.begin(); snakeBody != snake.end(); ++snakeBody)
@@ -296,7 +310,7 @@ void Draw()
                 singlePoison->Draw(consoleHandle);
         }
 
-		for (const_iterator singlePowerUpFruit = powerUpFruit.begin(); singlePowerUpFruit != powerUpFruit.end(); ++singlePowerUpFruit)
+                for (const_iterator singlePowerUpFruit = powerUpFruit.begin(); singlePowerUpFruit != powerUpFruit.end(); ++singlePowerUpFruit)
         {
                 singlePowerUpFruit->Draw(consoleHandle);
         }
@@ -309,11 +323,11 @@ void Draw()
 
 void Update()
 {
-	Counter++;
+        Counter++;
         // Save the tail, we might need it later.
-				GameObject tail = *(snake.end() - 1);
-                tail.Symbol = ' ';
-                                tail.Color = Green;
+        GameObject tail = *(snake.end() - 1);
+        tail.Symbol = ' ';
+        tail.Color = Green;
 
         for (randomAccess_iterator i = snake.end() - 1; i != snake.begin(); --i)
         {
@@ -347,7 +361,9 @@ void Update()
                         direction.X = 0;
                         direction.Y = SnakeSpeed;
                         break;
-					case 27:
+
+					case ESC:
+
                      //checking if MaxScore has to be updated
                         if (MaxScore < Score)
                         {
@@ -359,16 +375,18 @@ void Update()
                         ClearScreen(consoleHandle);
                         Menu();
                         break;
-					case 'k':
-						SaveGame( &snake , &fruit, &poison, &Score );
-						break;
+
+						//save game
+										case 'k':
+                        SaveGame( &snake , &fruit, &poison, &Score );
+                        break;
                 };
         }
 
         snake.begin()->Coordinates.X += direction.X;
         snake.begin()->Coordinates.Y += direction.Y;
 
-				GameObject head = *snake.begin();
+                                GameObject head = *snake.begin();
                 head.Color = Green;
 
                 head.Draw(consoleHandle);
@@ -381,7 +399,7 @@ void Update()
                 {
                         // Remove the old fruit, increase the snake's size
                         Score += Points;
-                        PrintScore();
+                        PrintScoreAndLevel();
 
                         fruit.erase(i);
 
@@ -420,24 +438,24 @@ void Update()
                 if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                 {
                     // Remove poison and decrease the snake's size
-                                                if (snake.begin() < snake.end()-1)
+                           if (snake.begin() < snake.end()-1)
                             {
-                                                                if (Score == 0)
-                                                                {
-                                                                        QuitGameOver();
-                                                                }
-                                                                else
-                                                                        Score -= 5;
-                                PrintScore();
+                                   if (Score == 0 || Score <= 5)
+                                   {
+                                        QuitGameOver();
+                                   }
+                                   else
+								   {
+                                       Score -= 5;
+								   }
 
-                                                                poison.erase(i);
-
+								PrintScoreAndLevel();
+                                poison.erase(i);
                                 tail = *(snake.end() - 1);
                                 tail.Symbol = ' ';
                                 tail.Draw(consoleHandle);
-
-                                                                snake.erase(snake.end() - 1);
-                                                                Beep(220,800);
+								snake.erase(snake.end() - 1);
+                                Beep(220,800);
 
                         // Add a new poisonous fruit
                                                 
@@ -445,15 +463,15 @@ void Update()
                                 tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PoisonSymbol);
                                 poison.push_back(tail);
                                 tail.Draw(consoleHandle);
-						
+                                                
 
 
                        // Break, since you can't eat more than one fruit at the same time.
-                                                                break;
+                               break;
                                                         }
-                      else
+							else
                             {
-                                                                QuitGameOver();
+                               QuitGameOver();
                             }
                 }
 
@@ -471,10 +489,10 @@ void Update()
                                         i->Symbol = '*';
                                         i->Color = Red;
                                         i->Draw(consoleHandle);
-                                                                                QuitGameOver();
-                                                        }
+                                        QuitGameOver();
+                                  }
 
-                                }
+                             }
 
 
                                 //if the snake crosses itself
@@ -487,13 +505,13 @@ void Update()
                                         i->Symbol = '*';
                                         i->Color = Red;
                                         i->Draw(consoleHandle);
-                                                                                QuitGameOver();
+                                        QuitGameOver();
                                                         }
 
                                 }
 
-				 //if the snake crosses X_Element
-				for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
+                                 //if the snake crosses X_Element
+                                for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
                                 {
                        if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
                                                         {
@@ -507,60 +525,71 @@ void Update()
 
                                 }
 
-				//if the snake crosses PowerUpFruit
-				for (randomAccess_iterator i = powerUpFruit.begin(); i != powerUpFruit.end(); ++i)
-				{
-						if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
-						{
-							tail.Symbol = ' ';
-                            tail.Draw(consoleHandle);
-                            i->Symbol = '*';
+                                //if the snake crosses PowerUpFruit
+                                for (randomAccess_iterator i = powerUpFruit.begin(); i != powerUpFruit.end(); ++i)
+                                {
+                                                if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
+                                                {
+                                                        tail.Symbol = ' ';
+														tail.Draw(consoleHandle);
+														i->Symbol = '*';
 
-							 COORD CurrentCoordinates = GeneratingCoordinations ();
-							 tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpFruit);
-							 powerUpFruit.push_back(tail);
-                             tail.Draw(consoleHandle);
-							 sleepDuration -= 50;
-							 break;
-						}
-				}
-				
-				if (Counter % 100 == 0)
-				{
-					 
-					 COORD CurrentCoordinates = GeneratingCoordinations ();
-					 tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, X_Element);
-					 x_element.push_back(tail);
-					 for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
-                        {
-                                tail.Color = Red;
-                        }
-					 tail.Draw(consoleHandle);
-					 ArrayCoordinatesX[CurrentCoordinates.X] = CurrentCoordinates.X;
-					 ArrayCoordinatesY[CurrentCoordinates.Y] = CurrentCoordinates.Y;
-					 
-				}
+                                                         COORD CurrentCoordinates = GeneratingCoordinations ();
+                                                         tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpFruit);
+                                                         powerUpFruit.push_back(tail);
+														tail.Draw(consoleHandle);
+                                                         sleepDuration -= 10;
+                                                         break;
+                                                }
+                                }
+                                
 
-				for (int i = 0; i < WindowWidth; ++i)
-				{
-					for (int j = 0; j < WindowHeight; ++j)
-					{
-						//if the snake crosses X_Element
-						for (randomAccess_iterator k = x_element.begin(); k != x_element.end(); ++k)
+								//generating new x elements
+                                if (Counter % X_ElementGenerationSpeed == 0)
+                                {
+                                         Counter = 0;
+                                         COORD CurrentCoordinates = GeneratingCoordinations ();
+                                         tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, X_Element);
+                                         x_element.push_back(tail);
+                                         for (randomAccess_iterator i = x_element.begin(); i != x_element.end(); ++i)
+										{
+											tail.Color = Red;
+										}
+                                         tail.Draw(consoleHandle);
+                                         ArrayCoordinatesX[CurrentCoordinates.X] = CurrentCoordinates.X;
+                                         ArrayCoordinatesY[CurrentCoordinates.Y] = CurrentCoordinates.Y;
+                                         
+                                }
+
+                                for (int i = 0; i < WindowWidth; ++i)
+                                {
+                                        for (int j = 0; j < WindowHeight; ++j)
+                                        {
+                                                //if the snake crosses X_Element
+                                                for (randomAccess_iterator k = x_element.begin(); k != x_element.end(); ++k)
                         {
-							  if (head.Coordinates.X == ArrayCoordinatesX[i] && head.Coordinates.Y == ArrayCoordinatesY[j])
-                                                        {
-                                        tail.Symbol = ' ';
-                                        tail.Draw(consoleHandle);
-                                        k->Symbol = '*';
-                                        k->Color = Red;
-                                        k->Draw(consoleHandle);
-                                                                                QuitGameOver();
-                                                        }
+                                                if (head.Coordinates.X == ArrayCoordinatesX[i] && head.Coordinates.Y == ArrayCoordinatesY[j])
+                                                {
+													tail.Symbol = ' ';
+													tail.Draw(consoleHandle);
+													k->Symbol = '*';
+													k->Color = Red;
+													k->Draw(consoleHandle);
+                                                    QuitGameOver();
+                                                 }
 
                            }
+                                        }
+                                }
+
+			//check if score is high enough to increase level
+
+					if ( ( Score - InitialScore ) >= 30 )
+					{
+						InitialScore = Score;
+						LevelUp();
 					}
-				}
+
 }
 
 void GeneratingWall ()
@@ -594,13 +623,84 @@ void CenterString(string str)
         cout << str;
 }
 
-void PrintScore()
+void LevelUp()
+{
+	if ( StartSleep == 400 || Level == 15 )  // if the player has reached/is starting from level 15, don't increase the level;
+	{
+		Level = 15;
+		LevelPointsRatio = 2.5; // set LevelPointsRatio to 2.5
+		X_ElementGenerationSpeed = 50; // X elements are being generated on every 50th update
+	}
+	else  // if Level < 15
+	{
+		Level ++;   // level up
+		sleepDuration += 10;  // increase speed
+
+
+		if ( sleepDuration > StartSleep ) // if speed has been increased check level
+		{
+			switch(Level)
+			{
+			case 2:
+				LevelPointsRatio += 0.1;  // if level 2, increase LevelPointsRatio by 0.1
+				break;
+			case 3:
+				LevelPointsRatio += 0.1;
+				X_ElementGenerationSpeed -= 10;  // x elements are generated faster if the played reaches level 3
+				break;
+			case 4:
+				LevelPointsRatio += 0.1;
+				break;
+			case 5:
+				LevelPointsRatio += 0.1;
+				break;
+			case 6:
+				LevelPointsRatio += 0.1;
+				X_ElementGenerationSpeed -= 10; // x elements are generated faster if the played reaches level 6
+				break;
+			case 7:
+				LevelPointsRatio += 0.1;
+				break;
+			case 8:
+				LevelPointsRatio += 0.1;
+				break;
+			case 9:
+				LevelPointsRatio += 0.1;
+				X_ElementGenerationSpeed -= 10; // x elements are generated faster if the played reaches level 9
+				break;
+			case 10:
+				LevelPointsRatio += 0.1;
+				break;
+			case 11:
+				LevelPointsRatio += 0.1;
+				break;
+			case 12:
+				LevelPointsRatio += 0.1;
+				X_ElementGenerationSpeed -= 10; // x elements are generated faster if the played reaches level 12
+				break;
+			case 13:
+				LevelPointsRatio += 0.1;
+				break;
+			case 14:
+				LevelPointsRatio += 0.1;
+				break;
+			}
+
+		}
+
+		
+	}
+}
+
+void PrintScoreAndLevel()
 {
         string text;
+		//int Level = 1;
+
         GameObject current (0,0,' ');
         current.Color = Green;
         current.Draw(consoleHandle);
-        text = "Highest Score This Session: " +  to_string(MaxScore) + "        Score: " + to_string(Score);
+        text = "Highest Score This Session: " +  to_string(MaxScore) + "        Score: " + to_string(Score) + "   Level: " + to_string(Level);
         CenterString(text);
         current.Color = 15;
 }
@@ -617,23 +717,23 @@ void SaveScore(int score) //saves score to scores.txt
 
 void SaveGame( vector<GameObject> *snake ,vector<GameObject> *fruit, vector<GameObject> *poison, unsigned int* score )
 {
-	ofstream o_SavedGameFile("saved game.txt");
+        ofstream o_SavedGameFile("saved game.txt");
 
-	GameObject head = (*snake)[0]; //set 'head' equal to the first element of 'snake'
-	GameObject tail = (*snake)[(*snake).size() - 1]; //set 'tail' equal to the last element of 'snake'
-	GameObject normal_fruit = (*fruit)[0];
-	GameObject pois_fruit = (*poison)[0];
+        GameObject head = (*snake)[0]; //set 'head' equal to the first element of 'snake'
+        GameObject tail = (*snake)[(*snake).size() - 1]; //set 'tail' equal to the last element of 'snake'
+        GameObject normal_fruit = (*fruit)[0];
+        GameObject pois_fruit = (*poison)[0];
 
-	//save coordinates and score
+        //save coordinates and score
         if (o_SavedGameFile.is_open())
         {
-			o_SavedGameFile << head.Coordinates.X << " " << head.Coordinates.Y << "\n";
-			o_SavedGameFile << tail.Coordinates.X << " " << tail.Coordinates.Y << "\n";
-			o_SavedGameFile << normal_fruit.Coordinates.X << " " << normal_fruit.Coordinates.Y << "\n";
-			o_SavedGameFile << pois_fruit.Coordinates.X << " " << pois_fruit.Coordinates.Y << "\n";
-			o_SavedGameFile << *score << "\n";
-			o_SavedGameFile.close();
-		}
+                        o_SavedGameFile << head.Coordinates.X << " " << head.Coordinates.Y << "\n";
+                        o_SavedGameFile << tail.Coordinates.X << " " << tail.Coordinates.Y << "\n";
+                        o_SavedGameFile << normal_fruit.Coordinates.X << " " << normal_fruit.Coordinates.Y << "\n";
+                        o_SavedGameFile << pois_fruit.Coordinates.X << " " << pois_fruit.Coordinates.Y << "\n";
+                        o_SavedGameFile << *score << "\n";
+                        o_SavedGameFile.close();
+                }
 }
 
 int GetScore() //reads score from scores.txt
@@ -649,11 +749,11 @@ int GetScore() //reads score from scores.txt
 
 void LoadGame()
 {
-	ifstream i_SavedGameFile("scores.txt");
-	if (i_SavedGameFile.is_open())
-	{
-		//must add later
-	}
+        ifstream i_SavedGameFile("scores.txt");
+        if (i_SavedGameFile.is_open())
+        {
+                //must add later
+        }
 }
 
 void SetDifficulty()
@@ -687,30 +787,42 @@ void SetDifficulty()
         case '1':
                         Beep(520,200);
                         sleepDuration = 400;
+						StartSleep = sleepDuration;
                         ClearScreen(consoleHandle);
+						LevelPointsRatio = 0.5;
+						Level = 1;
                         SetDifficulty();
                         break;
                 case '2':
                         Beep(520,200);
                         sleepDuration = 200;
+						StartSleep = sleepDuration;
                         ClearScreen(consoleHandle);
+						LevelPointsRatio = 1;
+						Level = 1;
                         SetDifficulty();
                         break;
                 case '3':
                         Beep(520,200);
                         sleepDuration = 100;
+						StartSleep = sleepDuration;
                         ClearScreen(consoleHandle);
+						LevelPointsRatio = 2;
+						Level = 10;
                         SetDifficulty();
                         break;
                 case '4':
                         Beep(520,200);
                         sleepDuration = 50;
+						StartSleep = sleepDuration;
                         ClearScreen(consoleHandle);
+						LevelPointsRatio = 2.5;
+						Level = 15;
                         SetDifficulty();
                         break;
                 case 27:
-						ClearScreen(consoleHandle);
-						 Menu();
+                        ClearScreen(consoleHandle);
+                        Menu();
                         break;
         }
         
@@ -722,9 +834,10 @@ void QuitGameOver()
                         {
                                 MaxScore = Score;
                         }
-		//before quitting the game, check if highest score should be updated
-		UpdateHighestScore();
+                //before quitting the game, check if highest score should be updated
+                UpdateHighestScore();
                 Beep(520,2000);
+
         GameObject current (0,9,' ');
         current.Color = Red;
         current.Draw(consoleHandle);
@@ -770,37 +883,37 @@ char RandomizeFruitSymbol()
                 case '@':
                         Symbol = '@';
                                                 ColorOfFruit = LightBlue;
-                                                Points = 2;
+                                                Points = 2 * LevelPointsRatio; //change points depending on difficulty level
                         break;
                 case '#':
                         Symbol = '#';
                                                 ColorOfFruit = Green;
-                                                Points = 4;
+                                                Points = 4 * LevelPointsRatio;
                         break;
                 case '$':
                         Symbol = '$';
-						ColorOfFruit = LightBlue;
-                                                Points = 6;
+                                                ColorOfFruit = LightBlue;
+                                                Points = 6 * LevelPointsRatio;
                         break;
                 case '^':
                         Symbol = '^';
                                                 ColorOfFruit = Pink;
-                                                Points = 8;
+                                                Points = 8 * LevelPointsRatio;
                         break;
                 case '&':
                         Symbol = '&';
                                                 ColorOfFruit = Cyan;
-                                                Points = 10;
+                                                Points = 10 * LevelPointsRatio;
                         break;
                 case '*':
                         Symbol = '*';
                                                 ColorOfFruit = White;
-                                                Points = 12;
+                                                Points = 12 * LevelPointsRatio;
                         break;
                 case '+':
                         Symbol = '+';
                                                 ColorOfFruit = Green;
-                                                Points = 14;
+                                                Points = 14 * LevelPointsRatio;
                         break;
                 };
                 return Symbol;
@@ -808,7 +921,7 @@ char RandomizeFruitSymbol()
 
 void UpdateHighestScore()
 {
-	  int score = GetScore();
+          int score = GetScore();
       if ( MaxScore > score )
       {
           SaveScore(MaxScore);
