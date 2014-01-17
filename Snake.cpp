@@ -353,11 +353,11 @@ void Update()
         snake.begin()->Coordinates.X += direction.X;
         snake.begin()->Coordinates.Y += direction.Y;
 
-				GameObject head = *snake.begin();
-                head.Color = Green;
-
-                head.Draw(consoleHandle);
-                tail.Draw(consoleHandle);
+		GameObject head = *snake.begin();
+        head.Color = Green;
+				
+        head.Draw(consoleHandle);
+        tail.Draw(consoleHandle);
 
 
                 for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
@@ -470,51 +470,99 @@ void Update()
 						 powerupwalls.erase(i);
 						 isPowerUpWalls = false;
 						 MoveThroughWalls++;
+						 PrintScore();
 						 break;
 					}
 				  }
-                                 
+                                
 
-                //if the snake touches one of the borders
+			if ( MoveThroughWalls == 0) //if the snake hasn't eaten a PowerUp fruit, it dies when it touches one of the border;
+			{ 
                 for (randomAccess_iterator i = wall.begin(); i != wall.end(); ++i)
                 {
-                       if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
-                       {
-						   if ( MoveThroughWalls == 0) //if snake hasn't eaten a PowerUp fruit, it dies;
-						   {
-                                        tail.Symbol = ' ';
-                                        tail.Draw(consoleHandle);
-                                        i->Symbol = '*';
-                                        i->Color = Red;
-                                        i->Draw(consoleHandle);
-                                        QuitGameOver();
-						   }
+                     if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
+					{
+                          tail.Symbol = ' ';
+                          tail.Draw(consoleHandle);
+                          i->Symbol = '*';
+                          i->Color = Red;
+                          i->Draw(consoleHandle);
+                          QuitGameOver();
+					}
+				}
+             }
 
-							if ( MoveThroughWalls > 0 ) // if snake has eaten a PowerUp fruit, it moves through the wall;
+
+
+				 if ( MoveThroughWalls > 0 ) // if the snake has eaten a PowerUp fruit, it moves through the wall;
+					{
+						for (randomAccess_iterator i = snake.begin(); i != snake.end(); ++i )
+						{
+							if (i->Coordinates.X == ( BorderX ) && direction.X == -1) // if some part of the snake is about to touch the left wall, flip x coordinates
 							{
 								MoveThroughWalls--;
+								PrintScore();
+								i->Coordinates.X = ( WindowWidth - BorderX - 1);
+								
+								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick) // draw wall again
+								{
+									brick->Draw(consoleHandle);
+								}
 
-								if ( head.Coordinates.X == ( BorderX + 1 ) && direction.X == -1 )
-								{
-									head.Coordinates.X = WindowWidth - BorderX - 1;
-								}
-								if ( head.Coordinates.X == ( WindowWidth - BorderX - 1) && direction.X == 1 )
-								{
-									head.Coordinates.X = ( BorderX + 1 );
-								}
-								if ( head.Coordinates.Y == ( BorderY + 1 ) && direction.Y == -1 )
-								{
-									head.Coordinates.Y = WindowWidth - BorderY - 1;
-								}
-								if ( head.Coordinates.Y == ( WindowHeight - BorderY - 1) && direction.Y == 1 )
-								{
-									head.Coordinates.Y = BorderY + 1;
-								}
+								i->Color = Green;
+								i->Draw(consoleHandle);
 
 							}
-                       }
 
-                }
+							if (i->Coordinates.X == ( WindowWidth - BorderX ) && direction.X == 1) // if some part of the snake is about to touch the right wall, flip x coordinates
+							{
+								MoveThroughWalls--;
+								PrintScore();
+								i->Coordinates.X = ( BorderX + 1);
+
+								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)  // draw wall again
+								{
+									brick->Draw(consoleHandle);
+								}
+
+								i->Color = Green;
+								i->Draw(consoleHandle);
+							}
+
+							if (i->Coordinates.Y == ( BorderY ) && direction.Y == -1) // if some part of the snake is about to touch the upper wall, flip y coordinates
+							{
+								MoveThroughWalls--;
+								PrintScore();
+								i->Coordinates.Y = ( WindowHeight - BorderY - 1 );
+
+								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)  // draw wall again
+								{
+									brick->Draw(consoleHandle);
+								}
+
+								i->Color = Green;
+								i->Draw(consoleHandle);i->Draw(consoleHandle);
+							}
+
+							if (i->Coordinates.Y == ( WindowHeight - BorderY ) && direction.Y == 1) // if some part of the snake is about to touch the bottom wall, flip y coordinates
+							{
+								MoveThroughWalls--;
+								PrintScore();
+								i->Coordinates.Y = ( BorderY + 1 );
+
+								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick) // draw wall again
+								{
+									brick->Draw(consoleHandle);
+								}
+								
+								i->Color = Green;
+								i->Draw(consoleHandle);
+
+							}
+						}
+						
+
+					}
 
 
                                 //if the snake crosses itself
@@ -570,7 +618,7 @@ void PrintScore()
         GameObject current (0,0,' ');
         current.Color = Green;
         current.Draw(consoleHandle);
-        text = "Highest Score This Session: " +  to_string(MaxScore) + "      Score: " + to_string(Score);
+        text = "Highest Score This Session: " +  to_string(MaxScore) + "    Score: " + to_string(Score) + "  W: " + to_string(MoveThroughWalls);
         CenterString(text);
         current.Color = 15;
 }
