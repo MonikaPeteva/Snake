@@ -448,10 +448,10 @@ void Update()
         }
 
 
-				if ( Score > 0 && ( isPowerUpWalls == false ) ) //generate PowerUp fruit only if player has more than 30 points and there are no other PW fruits
+				if ( Score > 30 && ( isPowerUpWalls == false ) ) //generate PowerUp fruit only if player has more than 30 points and there are no other PW fruits
 				{
 					srand (time(NULL));
-					if ( ( rand() % 6 ) == 0 )		// generate PowerUp fruits at random
+					if ( ( rand() % 7 ) == 0 )		// generate PowerUp fruits at random
 					{
 						COORD CurrentCoordinates = GeneratingCoordinations ();
 						tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpWallsSymbol);
