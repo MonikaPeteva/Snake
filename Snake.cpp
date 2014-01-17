@@ -95,8 +95,10 @@ int main()
 
         srand(time(NULL));
 
-                FruitSymbol = RandomizeFruitSymbol();
+        FruitSymbol = RandomizeFruitSymbol();
         COORD CurrentCoordinates = GeneratingCoordinations();
+
+
         fruit.push_back(GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, FruitSymbol));
 
                 for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
@@ -214,6 +216,10 @@ void GameInstructions()
                 CenterString("When it eats one of the poisonous fruits, the snake gets shorter.\n");
                 CenterString("Your goal is to make the snake as long as possible.\n");
         CenterString("If the snake crosses itself or bumps into a border, it dies.\n\n");
+
+		CenterString("Once you have more than 30 points, you may see a special 'W' fruit.\n");
+		CenterString("It allows you to move through the walls.\n\n");
+
         CenterString("To go FORWARD press 'w'\n");
         CenterString("To go BACK press 's'\n");
         CenterString("To turn RIGHT press 'd'\n");
@@ -634,6 +640,42 @@ COORD GeneratingCoordinations ()
         COORD momental;
         momental.X = rand() % (WindowWidth-2*(BorderX+1))+BorderX+1;
         momental.Y = rand() % (WindowHeight-2*(BorderY+1))+BorderY+1;
+
+		//checking if coordinates are free
+
+		if ( fruit.begin() != fruit.end())  // if there is a fruit, check if coordinates are the same
+		{
+			for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
+			{ 
+				if ( ( momental.X == i->Coordinates.X ) && ( momental.Y == i->Coordinates.Y ))
+				{
+					GeneratingCoordinations (); //call the function again
+					break;
+				}
+			}
+		}
+
+		if ( poison.begin() != poison.end())  // if there is a poisonous fruit, check if coordinates are the same
+		{
+			for (randomAccess_iterator i = poison.begin(); i != poison.end(); ++i)
+			{ 
+				if ( ( momental.X == i->Coordinates.X ) && ( momental.Y == i->Coordinates.Y ) )
+				{
+					GeneratingCoordinations ();
+					break;
+				}
+			}
+		}
+
+			for (randomAccess_iterator i = snake.begin(); i != snake.end(); ++i) // check all the coordinates of snake
+             {
+                if ( ( i->Coordinates.X == momental.X ) && ( i->Coordinates.Y == momental.Y ) )
+				{
+					GeneratingCoordinations ();
+					break;
+			}
+		}
+
         return momental;
 }
 
