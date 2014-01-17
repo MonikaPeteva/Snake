@@ -26,26 +26,42 @@ const int BorderX = 3, BorderY = 2;
 const int SnakeSpeed = 1;
 const int SnakeStartingLength = 5;
 const char SnakeSymbol = '*',
+
+// fruit / poison / wall / powerup fruit symbols 
+
         WallSymbol = 'X',
         PoisonSymbol = '-',
 		PowerUpWallsSymbol = 'W';
-char FruitSymbol;
-int Points;
-ConsoleColor ColorOfFruit;
+
+char FruitSymbol; //not a constant, it can change;
+
+ConsoleColor ColorOfFruit,
+	ColorOfSnake = Green,
+	ColorOfText = Green,
+	ColorOfWalls = White;
 
 // Game variables
+
 unsigned long sleepDuration = 200;
 const int ESC = 27;
+enum SoundMood { happy, neutral, sad };
+bool isSoundOn = true;
+
 vector<GameObject> snake;
 vector<GameObject> fruit;
 vector<GameObject> poison;
 vector<GameObject> wall;
 vector<GameObject> powerupwalls;
 
+// points, scores and skills
+
+int Points;
 unsigned int Score = 0;
 unsigned int MaxScore = 0;
 unsigned int MoveThroughWalls = 0;
 bool isPowerUpWalls = false; // true if there is a PowerUp fruit; false otherwise
+
+
 COORD direction ;
 
 void Menu();
@@ -66,6 +82,11 @@ void QuitGameOver();
 char RandomizeFruitSymbol();
 void SaveGame( vector<GameObject> *snake ,vector<GameObject> *fruit, vector<GameObject> *poison, unsigned int* score  );
 void UpdateHighestScore();
+void ChangeOptions();
+void Graphics();
+void SetColor(ConsoleColor& color);
+void MakeSound( SoundMood mood );
+void SetSound();
 
 int main()
 {
@@ -109,11 +130,14 @@ void Menu()
         CenterString("1. Play New Game\n");
         CenterString("2. See Game Instructions\n");
         CenterString("3. See Highest Score\n");
-                CenterString("4. Difficulty Settings\n");
-        CenterString("5. Exit Game\n");
+        CenterString("4. Difficulty Settings\n");
+		CenterString("5. Change Game Options\n");
+        CenterString("6. Exit Game\n");
 
-                Beep(520,300);
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of border
+          MakeSound(neutral); //make sound when menu appears
+        
+				
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);  //change color of border
         
 cout << "      _    _" << endl;
 cout << "   ,-(|)--(|)-." << endl;
@@ -135,7 +159,7 @@ cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
         {
         case '1':  
              //play new game
-                Beep(520,200);
+			MakeSound(neutral);
                 ClearScreen(consoleHandle);
                 Initialization();
                 Draw();
@@ -147,24 +171,29 @@ cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
                 break;
         case '2':  
              //see instructions
-                Beep(520,200);
+                MakeSound(neutral);
                 ClearScreen(consoleHandle);
                 GameInstructions();
                 break;
         case '3': 
                         //see highest score
-                                Beep(520,200);
+                MakeSound(neutral);
                 ClearScreen(consoleHandle);
                 DisplayHighestScore();
                 break;
 		case '4':
-                Beep(520,200);
+                MakeSound(neutral);
                 ClearScreen(consoleHandle);
                 SetDifficulty();
                 break;
-        case '5': 
+		case '5':
+				MakeSound(neutral);
+                ClearScreen(consoleHandle);
+				ChangeOptions();
+				break;
+        case '6': 
                         //quit game
-                Beep(520,200);
+                MakeSound(neutral);
                 QuitGame();
         }
 }
@@ -256,7 +285,7 @@ void Initialization ()
         {
                         snake.push_back(GameObject(i+BorderX+1, BorderY+1, SnakeSymbol));
                                                 for (randomAccess_iterator i = snake.begin(); i != snake.end(); ++i)
-                                                        i->Color = Green;
+													i->Color = ColorOfSnake;
         }
 
         GeneratingWall ();
@@ -283,8 +312,9 @@ void Draw()
                 singlePoison->Draw(consoleHandle);
         }
 
-                for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)
+                for (randomAccess_iterator brick = wall.begin(); brick != wall.end(); ++brick)
         {
+				brick ->Color = ColorOfWalls;
                 brick->Draw(consoleHandle);
         }
 }
@@ -294,12 +324,12 @@ void Update()
         // Save the tail, we might need it later.
 				GameObject tail = *(snake.end() - 1);
                 tail.Symbol = ' ';
-                tail.Color = Green;
+                tail.Color = ColorOfSnake;
 
         for (randomAccess_iterator i = snake.end() - 1; i != snake.begin(); --i)
         {
                 GameObject next = *(i - 1);
-                i->Color = Green;
+                i->Color = ColorOfSnake;
                 i->UpdateCoordinates(next.Coordinates);
         }
 
@@ -309,22 +339,22 @@ void Update()
                 switch (key)
                 {
                                         case 'a':
-                                                Beep(420,200);
+                                                MakeSound(neutral);
                         direction.X = -SnakeSpeed;
                         direction.Y = 0;
                         break;
                                         case 'w':
-                                                Beep(620,200);
+                                                MakeSound(neutral);
                         direction.X = 0;
                         direction.Y = -SnakeSpeed;
                         break;
                     case 'd':
-                                                Beep(420,200);
+                                                MakeSound(neutral);
                         direction.X = SnakeSpeed;
                         direction.Y = 0;
                         break;
                     case 's':
-                                                Beep(620,200);
+                                                MakeSound(neutral);
                         direction.X = 0;
                         direction.Y = SnakeSpeed;
                         break;
@@ -335,18 +365,18 @@ void Update()
                         {
                               MaxScore=Score;
                         }
-
-                    //checking if MaxScore is the highest score achieved in the game
-                       UpdateHighestScore();
-
-					   isPowerUpWalls = false;
-
+                   
+                       UpdateHighestScore();   //checking if MaxScore is the highest score achieved in the game
+					   isPowerUpWalls = false;  // there will be no power up fruit generated
                         ClearScreen(consoleHandle);
                         Menu();
                         break;
 					case 'k':
 						SaveGame( &snake , &fruit, &poison, &Score );
 						break;
+
+					default:
+					break;
                 };
         }
 
@@ -354,7 +384,7 @@ void Update()
         snake.begin()->Coordinates.Y += direction.Y;
 
 		GameObject head = *snake.begin();
-        head.Color = Green;
+        head.Color = ColorOfSnake;
 				
         head.Draw(consoleHandle);
         tail.Draw(consoleHandle);
@@ -374,9 +404,9 @@ void Update()
                         snake.push_back(tail);
 
                         tail.Symbol = '*';
-                        tail.Color = Green;
+                        tail.Color = ColorOfSnake;
                         tail.Draw(consoleHandle);
-                        Beep(700,850);
+                        MakeSound(happy);
 
                         // Add a new fruit
                                                                                                 
@@ -426,7 +456,7 @@ void Update()
                                 tail.Draw(consoleHandle);
 
                                 snake.erase(snake.end() - 1);
-                                Beep(220,800);
+                                MakeSound(sad);
 
                         // Add a new poisonous fruit
                                                 
@@ -466,7 +496,7 @@ void Update()
 				{
 					if (head.Coordinates.X == i->Coordinates.X && head.Coordinates.Y == i->Coordinates.Y)
 					{
-						Beep(700,850);
+						MakeSound(happy);
 						 powerupwalls.erase(i);
 						 isPowerUpWalls = false;
 						 MoveThroughWalls++;
@@ -504,12 +534,13 @@ void Update()
 								PrintScore();
 								i->Coordinates.X = ( WindowWidth - BorderX - 1);
 								
-								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick) // draw wall again
+								for (randomAccess_iterator brick = wall.begin(); brick != wall.end(); ++brick) // draw wall again
 								{
 									brick->Draw(consoleHandle);
+									brick->Color = ColorOfWalls;
 								}
 
-								i->Color = Green;
+								i->Color = ColorOfSnake;
 								i->Draw(consoleHandle);
 
 							}
@@ -520,12 +551,13 @@ void Update()
 								PrintScore();
 								i->Coordinates.X = ( BorderX + 1);
 
-								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)  // draw wall again
+								for (randomAccess_iterator brick = wall.begin(); brick != wall.end(); ++brick)  // draw wall again
 								{
 									brick->Draw(consoleHandle);
+									brick->Color = ColorOfWalls;
 								}
 
-								i->Color = Green;
+								i->Color = ColorOfSnake;
 								i->Draw(consoleHandle);
 							}
 
@@ -535,12 +567,13 @@ void Update()
 								PrintScore();
 								i->Coordinates.Y = ( WindowHeight - BorderY - 1 );
 
-								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick)  // draw wall again
+								for (randomAccess_iterator brick = wall.begin(); brick != wall.end(); ++brick)  // draw wall again
 								{
 									brick->Draw(consoleHandle);
+									brick->Color = ColorOfWalls;
 								}
 
-								i->Color = Green;
+								i->Color = ColorOfSnake;
 								i->Draw(consoleHandle);i->Draw(consoleHandle);
 							}
 
@@ -550,12 +583,13 @@ void Update()
 								PrintScore();
 								i->Coordinates.Y = ( BorderY + 1 );
 
-								for (const_iterator brick = wall.begin(); brick != wall.end(); ++brick) // draw wall again
+								for (randomAccess_iterator brick = wall.begin(); brick != wall.end(); ++brick) // draw wall again
 								{
 									brick->Draw(consoleHandle);
+									brick->Color = ColorOfWalls;
 								}
 								
-								i->Color = Green;
+								i->Color = ColorOfSnake;
 								i->Draw(consoleHandle);
 
 							}
@@ -616,11 +650,11 @@ void PrintScore()
 {
         string text;
         GameObject current (0,0,' ');
-        current.Color = Green;
+        current.Color = ColorOfText;
         current.Draw(consoleHandle);
         text = "Highest Score This Session: " +  to_string(MaxScore) + "    Score: " + to_string(Score) + "  W: " + to_string(MoveThroughWalls);
         CenterString(text);
-        current.Color = 15;
+        current.Color = ColorOfText;
 }
 
 void SaveScore(int score) //saves score to scores.txt
@@ -703,25 +737,25 @@ void SetDifficulty()
         switch(k)
         {
         case '1':
-                        Beep(520,200);
+                       MakeSound(neutral);
                         sleepDuration = 400;
                         ClearScreen(consoleHandle);
                         SetDifficulty();
                         break;
                 case '2':
-                        Beep(520,200);
+                        MakeSound(neutral);
                         sleepDuration = 200;
                         ClearScreen(consoleHandle);
                         SetDifficulty();
                         break;
                 case '3':
-                        Beep(520,200);
+                       MakeSound(neutral);
                         sleepDuration = 100;
                         ClearScreen(consoleHandle);
                         SetDifficulty();
                         break;
                 case '4':
-                        Beep(520,200);
+                        MakeSound(neutral);
                         sleepDuration = 50;
                         ClearScreen(consoleHandle);
                         SetDifficulty();
@@ -730,6 +764,8 @@ void SetDifficulty()
 						ClearScreen(consoleHandle);
 						 Menu();
                         break;
+				default:
+					break;
         }
         
 }
@@ -747,7 +783,7 @@ void QuitGameOver()
 		UpdateHighestScore();
 
 
-                Beep(520,2000);
+        MakeSound(sad);
         GameObject current (0,9,' ');
         current.Color = Red;
         current.Draw(consoleHandle);
@@ -762,7 +798,7 @@ void QuitGameOver()
         cout<<"    #     ####   ####     #######  ####   ####  ###### \n";
         
         GameObject tail = *(snake.end() - 1);
-		tail.Color = Green;
+		tail.Color = ColorOfSnake;
         tail.Draw(consoleHandle);
 
         char k = getch();
@@ -839,3 +875,258 @@ void UpdateHighestScore()
       }
 }
 
+
+void ChangeOptions()
+{
+
+	 string border (WindowWidth, ':');
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+        cout << "\n\n";
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
+                CenterString("Options: \n\n");
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+                CenterString("1. Graphics\n");
+                CenterString("2. Sound\n");
+				CenterString("3. Controls\n");
+
+        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
+
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+
+        char k = getch();
+        switch(k)
+        {
+        case '1':
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case '2':
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			SetSound();
+			break;
+		case ESC:
+			MakeSound(neutral);
+			ClearScreen(consoleHandle);
+			Menu();
+		default:
+			break;
+		}
+}
+
+void Graphics()
+{
+	string border (WindowWidth, ':');
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+        cout << "\n\n";
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
+                CenterString("Change: \n\n");
+				 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+                CenterString("1. Snake Color\n");
+                CenterString("2. Text Color\n");
+				CenterString("3. Color of Walls\n");
+
+        CenterString("Press 'ESC' to go back\n\n\n");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+
+        char k = getch();
+        switch(k)
+        {
+        case '1':
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			SetColor( ColorOfSnake ) ;
+			break;
+		case '2':
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			SetColor( ColorOfText );
+			break;
+		case '3':
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			SetColor( ColorOfWalls );
+			break;
+		case ESC:
+			MakeSound(neutral);
+			ClearScreen(consoleHandle);
+			ChangeOptions();
+            break;
+		default:
+			break;
+		}
+}
+
+void SetColor(ConsoleColor& color)
+{
+
+	//Printing color options
+
+	string border (WindowWidth, ':');
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+        cout << "\n\n";
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
+                CenterString("Select Color: \n\n");
+				 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+                CenterString("1. Light Blue\n");
+                CenterString("2. Green\n");
+				CenterString("3. Red\n");
+				CenterString("4. Yellow\n");
+				CenterString("5. Pink\n");
+				CenterString("6. Cyan\n");
+				CenterString("7. White\n");
+
+        CenterString("Press 'ESC' to go back\n\n\n");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+		//changing color depending on option
+
+		char k = getch();
+        switch(k)
+        {
+        case '1':
+			color = LightBlue;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case '2':
+			color = Green;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case '3':
+			color = Red;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case '4':
+			color = Yellow;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case '5':
+			color = Pink;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case '6':
+			color = Cyan;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case '7':
+			color = Cyan;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Graphics();
+			break;
+		case ESC:
+			MakeSound(neutral);
+			ClearScreen(consoleHandle);
+			Graphics();
+            break;
+		default:
+			break;
+	}
+}
+
+void SetSound()
+{
+	//Printing sound options
+
+	string border (WindowWidth, ':');
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+        cout << "\n\n";
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); //change color of text
+                CenterString("Sounds: \n\n");
+				 SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+                CenterString("1. On\n");
+                CenterString("2. Off\n");
+
+
+        CenterString("Press 'ESC' to go back\n\n\n");
+
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
+        cout << border << endl;
+        cout << border << endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
+		//changing sound depending on option
+		char k = getch();
+        switch(k)
+        {
+        case '1':
+			isSoundOn = true;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Menu();
+			break;
+		case '2':
+			isSoundOn = false;
+			MakeSound(neutral);
+            ClearScreen(consoleHandle);
+			Menu();
+		case ESC:
+			MakeSound(neutral);
+			ClearScreen(consoleHandle);
+			ChangeOptions();
+            break;
+		default:
+			break;
+		}
+}
+
+void MakeSound( SoundMood mood )
+{
+   if ( isSoundOn )
+	{
+		switch(mood)
+		{
+		case 0:
+			Beep(720,200);
+			break;
+		case 1:
+			Beep(420,200);
+			break;
+		case 2:
+			Beep(220,200);
+			break;
+	}
+  }
+}
