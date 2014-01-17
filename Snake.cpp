@@ -487,7 +487,7 @@ void Update()
 				if ( Score > 30 && ( isPowerUpWalls == false ) ) //generate PowerUp fruit only if player has more than 30 points and there are no other PW fruits
 				{
 					srand (time(NULL));
-					if ( ( rand() % 7 ) == 0 )		// generate PowerUp fruits at random
+					if ( ( rand() % 13 ) == 0 )		// generate PowerUp fruits at random
 					{
 						COORD CurrentCoordinates = GeneratingCoordinations ();
 						tail = GameObject(CurrentCoordinates.X, CurrentCoordinates.Y, PowerUpWallsSymbol);
@@ -1154,19 +1154,20 @@ void SetSound()
 		}
 }
 
+
 void MakeSound( SoundMood mood )
 {
    if ( isSoundOn )
 	{
 		switch(mood)
 		{
-		case 0:
+		case happy:
 			Beep(720,200);
 			break;
-		case 1:
+		case neutral:
 			Beep(420,200);
 			break;
-		case 2:
+		case sad:
 			Beep(220,200);
 			break;
 	}
