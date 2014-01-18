@@ -164,6 +164,7 @@ cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
 			MakeSound(neutral);
                 ClearScreen(consoleHandle);
                 Initialization();
+                MoveThroughWalls = 0;
                 Draw();
                 while (true)
                    {
