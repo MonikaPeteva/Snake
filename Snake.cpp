@@ -83,10 +83,11 @@ char RandomizeFruitSymbol();
 void SaveGame( vector<GameObject> *snake ,vector<GameObject> *fruit, vector<GameObject> *poison, unsigned int* score  );
 void UpdateHighestScore();
 void ChangeOptions();
-void Graphics();
-void SetColor(ConsoleColor& color);
+void GraphicsMenu();
+void SetColorMenu(ConsoleColor& color);
 void MakeSound( SoundMood mood );
-void SetSound();
+void SetSoundMenu();
+bool isCoordFree( COORD coordinates );
 
 int main()
 {
@@ -131,10 +132,9 @@ void Menu()
                 cout << endl;
         CenterString("1. Play New Game\n");
         CenterString("2. See Game Instructions\n");
-        CenterString("3. See Highest Score\n");
-        CenterString("4. Difficulty Settings\n");
-		CenterString("5. Change Game Options\n");
-        CenterString("6. Exit Game\n");
+        CenterString("3. See Highest Score\n");;
+		CenterString("4. Change Game Options\n");
+        CenterString("5. Exit Game\n");
 
           MakeSound(neutral); //make sound when menu appears
         
@@ -184,16 +184,11 @@ cout << "           `.____,-' `-.__.'        `-.___.'"<<endl;
                 DisplayHighestScore();
                 break;
 		case '4':
-                MakeSound(neutral);
-                ClearScreen(consoleHandle);
-                SetDifficulty();
-                break;
-		case '5':
 				MakeSound(neutral);
                 ClearScreen(consoleHandle);
 				ChangeOptions();
 				break;
-        case '6': 
+        case '5': 
                         //quit game
                 MakeSound(neutral);
                 QuitGame();
@@ -382,7 +377,7 @@ void Update()
 						break;
 
 					default:
-					break;
+						break;
                 };
         }
 
@@ -635,22 +630,33 @@ void GeneratingWall ()
         }
 }
 
-COORD GeneratingCoordinations ()
+COORD GeneratingCoordinations()
 {
         COORD momental;
-        momental.X = rand() % (WindowWidth-2*(BorderX+1))+BorderX+1;
-        momental.Y = rand() % (WindowHeight-2*(BorderY+1))+BorderY+1;
+		srand(time(NULL));
 
-		//checking if coordinates are free
+		do
+		{
+			momental.X = rand() % (WindowWidth-2*(BorderX+1))+BorderX+1;
+			momental.Y = rand() % (WindowHeight-2*(BorderY+1))+BorderY+1;
+		}
+		
+		while ( isCoordFree ( momental ) == false ); 
 
-		if ( fruit.begin() != fruit.end())  // if there is a fruit, check if coordinates are the same
+		
+
+        return momental;
+}
+
+bool isCoordFree( COORD coordinates ) //check if coordinates are free
+{
+	if ( fruit.begin() != fruit.end())  // if there is a fruit, check if coordinates are the same
 		{
 			for (randomAccess_iterator i = fruit.begin(); i != fruit.end(); ++i)
 			{ 
-				if ( ( momental.X == i->Coordinates.X ) && ( momental.Y == i->Coordinates.Y ))
+				if ( ( coordinates.X == i->Coordinates.X ) && ( coordinates.Y == i->Coordinates.Y ))
 				{
-					GeneratingCoordinations (); //call the function again
-					break;
+					return false;
 				}
 			}
 		}
@@ -659,24 +665,22 @@ COORD GeneratingCoordinations ()
 		{
 			for (randomAccess_iterator i = poison.begin(); i != poison.end(); ++i)
 			{ 
-				if ( ( momental.X == i->Coordinates.X ) && ( momental.Y == i->Coordinates.Y ) )
+				if ( ( coordinates.X == i->Coordinates.X ) && ( coordinates.Y == i->Coordinates.Y ) )
 				{
-					GeneratingCoordinations ();
-					break;
+					return false;
 				}
 			}
 		}
 
-			for (randomAccess_iterator i = snake.begin(); i != snake.end(); ++i) // check all the coordinates of snake
+			for (randomAccess_iterator i = snake.begin(); i != snake.end(); ++i) // check all the coordinates of the snake
              {
-                if ( ( i->Coordinates.X == momental.X ) && ( i->Coordinates.Y == momental.Y ) )
+                if ( ( coordinates.X == i->Coordinates.X ) && ( coordinates.Y == i->Coordinates.Y ) )
 				{
-					GeneratingCoordinations ();
-					break;
+					return false;
+				}
 			}
-		}
 
-        return momental;
+	  return true;
 }
 
 void CenterString(string str)
@@ -767,7 +771,7 @@ void SetDifficulty()
         CenterString("3. Hard\n");
         CenterString("4. Suicide\n\n");
 
-        CenterString("Press 'ESC' to get back to the main menu\n\n\n");
+        CenterString("Press 'ESC' to go back\n\n\n");
 
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
         cout << border << endl;
@@ -804,7 +808,7 @@ void SetDifficulty()
                         break;
                 case ESC:
 						ClearScreen(consoleHandle);
-						 Menu();
+						 ChangeOptions();
                         break;
 				default:
 					break;
@@ -933,7 +937,7 @@ void ChangeOptions()
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
                 CenterString("1. Graphics\n");
                 CenterString("2. Sound\n");
-				CenterString("3. Controls\n");
+				CenterString("3. Difficulty Level\n\n");
 
         CenterString("Press 'ESC' to get back to the main menu\n\n\n");
 
@@ -949,13 +953,18 @@ void ChangeOptions()
         case '1':
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case '2':
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			SetSound();
+			SetSoundMenu();
 			break;
+		case '3':
+                MakeSound(neutral);
+                ClearScreen(consoleHandle);
+                SetDifficulty();
+                break;
 		case ESC:
 			MakeSound(neutral);
 			ClearScreen(consoleHandle);
@@ -965,7 +974,7 @@ void ChangeOptions()
 		}
 }
 
-void Graphics()
+void GraphicsMenu()
 {
 	string border (WindowWidth, ':');
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); //change color of border
@@ -995,17 +1004,17 @@ void Graphics()
         case '1':
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			SetColor( ColorOfSnake ) ;
+			SetColorMenu( ColorOfSnake ) ;
 			break;
 		case '2':
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			SetColor( ColorOfText );
+			SetColorMenu( ColorOfText );
 			break;
 		case '3':
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			SetColor( ColorOfWalls );
+			SetColorMenu( ColorOfWalls );
 			break;
 		case ESC:
 			MakeSound(neutral);
@@ -1017,7 +1026,7 @@ void Graphics()
 		}
 }
 
-void SetColor(ConsoleColor& color)
+void SetColorMenu(ConsoleColor& color)
 {
 
 	//Printing color options
@@ -1056,55 +1065,55 @@ void SetColor(ConsoleColor& color)
 			color = LightBlue;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case '2':
 			color = Green;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case '3':
 			color = Red;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case '4':
 			color = Yellow;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case '5':
 			color = Pink;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case '6':
 			color = Cyan;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case '7':
 			color = Cyan;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
 			break;
 		case ESC:
 			MakeSound(neutral);
 			ClearScreen(consoleHandle);
-			Graphics();
+			GraphicsMenu();
             break;
 		default:
 			break;
 	}
 }
 
-void SetSound()
+void SetSoundMenu()
 {
 	//Printing sound options
 
@@ -1137,13 +1146,13 @@ void SetSound()
 			isSoundOn = true;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Menu();
+			ChangeOptions();
 			break;
 		case '2':
 			isSoundOn = false;
 			MakeSound(neutral);
             ClearScreen(consoleHandle);
-			Menu();
+			ChangeOptions();
 		case ESC:
 			MakeSound(neutral);
 			ClearScreen(consoleHandle);
@@ -1153,7 +1162,6 @@ void SetSound()
 			break;
 		}
 }
-
 
 void MakeSound( SoundMood mood )
 {
